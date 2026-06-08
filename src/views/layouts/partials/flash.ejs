@@ -1,0 +1,15 @@
+<% if (locals.flash_success && flash_success.length > 0) { %>
+  <div class="alert alert-success" role="alert">
+    <% flash_success.forEach(msg => { %><span><%- msg %></span><% }) %>
+  </div>
+<% } %>
+<% if (locals.flash_error && flash_error.length > 0) { %>
+  <div class="alert alert-error" role="alert">
+    <% flash_error.forEach(msg => { %><span><%- msg %></span><% }) %>
+  </div>
+<% } %>
+<% if (locals.flash_info && flash_info.length > 0) { %>
+  <div class="alert alert-info" role="alert">
+    <% flash_info.forEach(msg => { %><span><%- msg %></span><% }) %>
+  </div>
+<% } %>

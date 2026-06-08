@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konfirmasi Kedatangan · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+      </span>
+      <div class="brand-text">
+        SEHATI Front Desk
+        <span class="sub">Rekam Medis Elektronik · Rawat Jalan</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">Front Desk</div>
+    <a href="/kedatangan" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+      Konfirmasi Kedatangan
+    </a>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="logout-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar sesi
+      </a>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="main-topbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Cari pasien, nomor RM…">
+      </div>
+      <div class="right-tools">
+        <div class="user-chip">
+          <span class="avatar"><%= user.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase() %></span>
+          <div>
+            <div class="user-name"><%= user.nama %></div>
+            <div class="user-role">Resepsionis / Perawat</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <% if (locals.flash_success) { %><div class="flash success"><%= flash_success %></div><% } %>
+      <% if (locals.flash_error) { %><div class="flash error"><%= flash_error %></div><% } %>
+
+      <div class="page-head">
+        <div>
+          <div class="meta">Front Desk</div>
+          <h1>Konfirmasi Kedatangan</h1>
+        </div>
+        <form method="GET" action="/kedatangan" style="display:flex; gap:8px; align-items:center;">
+          <input type="date" name="tanggal" value="<%= tanggal %>" class="form-input" style="width:160px;">
+          <button type="submit" class="btn btn-ghost btn-sm">Tampilkan</button>
+        </form>
+      </div>
+
+      <p class="muted" style="margin-bottom:16px;">
+        <%= new Date(tanggal).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) %>
+      </p>
+
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>Daftar Kunjungan</h3>
+          <span class="tiny muted"><%= kunjungans.length %> jadwal</span>
+        </div>
+        <% if (kunjungans.length === 0) { %>
+          <p style="padding:24px; color:var(--ink-soft); text-align:center;">Tidak ada kunjungan pada tanggal ini.</p>
+        <% } else { %>
+          <table class="data-table" id="tabelKedatangan">
+            <thead>
+              <tr>
+                <th>Slot Jam</th>
+                <th>Pasien</th>
+                <th>No. RM</th>
+                <th>Dokter</th>
+                <th>Status</th>
+                <th>Waktu Konfirmasi</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% kunjungans.forEach(function(k) { %>
+              <tr id="row-<%= k.id %>">
+                <td><code style="font-family:var(--font-mono);"><%= k.slot_jam.substring(0,5) %></code></td>
+                <td>
+                  <div class="pasien-info">
+                    <div class="nama"><%= k.nama_pasien %></div>
+                    <div class="id"><%= k.keluhan_awal ? k.keluhan_awal.substring(0,40) + '...' : 'Tidak ada keluhan' %></div>
+                  </div>
+                </td>
+                <td><code style="font-family:var(--font-mono); font-size:12px;"><%= k.nomor_rm %></code></td>
+                <td>
+                  <div class="pasien-info">
+                    <div class="nama"><%= k.nama_dokter %></div>
+                    <div class="id"><%= k.spesialisasi || '' %></div>
+                  </div>
+                </td>
+                <td>
+                  <% const bm = {booked:'menengah', hadir:'ringan', selesai:'ringan', batal:'kritis', skip:'muted'}; %>
+                  <span class="badge badge-<%= bm[k.status] || 'muted' %>"><%= k.status %></span>
+                </td>
+                <td>
+                  <%= k.waktu_konfirmasi ? new Date(k.waktu_konfirmasi).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '—' %>
+                </td>
+                <td class="aksi-cell">
+                  <% if (k.status === 'booked') { %>
+                    <button class="btn btn-primary btn-sm btn-konfirmasi" data-id="<%= k.id %>">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      Konfirmasi Hadir
+                    </button>
+                  <% } else { %>
+                    <span class="muted tiny">Sudah hadir</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+document.querySelectorAll('.btn-konfirmasi').forEach(function(btn) {
+  btn.addEventListener('click', async function() {
+    const id = this.dataset.id;
+    this.disabled = true;
+    this.textContent = 'Memproses…';
+    try {
+      const r = await fetch('/kedatangan/' + id + '/konfirmasi', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'}
+      });
+      const data = await r.json();
+      if (data.ok) {
+        const row = document.getElementById('row-' + id);
+        row.querySelector('.badge').className = 'badge badge-ringan';
+        row.querySelector('.badge').textContent = 'hadir';
+        row.querySelector('td:nth-child(6)').textContent = new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+        this.closest('td').innerHTML = '<span class="muted tiny">✓ Dikonfirmasi</span>';
+      } else {
+        alert(data.message || 'Gagal mengkonfirmasi.');
+        this.disabled = false;
+        this.textContent = 'Konfirmasi Hadir';
+      }
+    } catch {
+      alert('Terjadi kesalahan jaringan.');
+      this.disabled = false;
+      this.textContent = 'Konfirmasi Hadir';
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulir SOAP · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+  <style>
+    /* Override soap-form max-width so it fills the content area */
+    .soap-form { max-width: none; }
+
+    /* 2-column grid on wide screens */
+    .soap-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .soap-grid .span-full { grid-column: 1 / -1; }
+
+    @media (max-width: 900px) {
+      .soap-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Vital grid: 4 on desktop, 2 on tablet, 1 on mobile */
+    .vital-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    @media (max-width: 700px) {
+      .vital-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 420px) {
+      .vital-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Resep table: scrollable on small screens */
+    .resep-scroll { overflow-x: auto; }
+    .resep-table th, .resep-table td { white-space: nowrap; }
+
+    /* Lock banner */
+    .lock-banner {
+      margin-bottom: 14px;
+      padding: 12px 16px;
+      background: #edf8ef;
+      border-left: 3px solid var(--ringan);
+      border-radius: var(--radius);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Patient header meta */
+    .patient-meta {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 2px;
+    }
+    .page-head h1 { font-size: 28px; }
+
+    /* Alergi banner */
+    .alergi-banner {
+      margin-bottom: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 16px;
+      background: #fff8ec;
+      border-left: 3px solid #f5a623;
+      border-radius: var(--radius);
+    }
+
+    /* Form actions */
+    .soap-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+      </span>
+      <div class="brand-text">
+        SEHATI Klinis
+        <span class="sub">Rekam Medis Elektronik · Rawat Jalan</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">Konsultasi</div>
+    <a href="/antrian" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Antrian Hari Ini
+    </a>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="logout-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar sesi
+      </a>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="main-topbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Cari pasien, nomor RM…">
+      </div>
+      <div class="right-tools">
+        <div class="user-chip">
+          <span class="avatar"><%= user.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase() %></span>
+          <div>
+            <div class="user-name"><%= user.nama %></div>
+            <div class="user-role">Dokter</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <a href="/antrian" class="back-link" style="display:inline-flex; margin-bottom:16px;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Antrian
+      </a>
+
+      <div class="page-head" style="margin-bottom:16px;">
+        <div>
+          <div class="patient-meta">No. RM <%= kunjungan.nomor_rm %> · <%= kunjungan.usia %> th · <%= kunjungan.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' %></div>
+          <h1><%= kunjungan.nama_pasien %></h1>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn btn-ghost" href="/riwayat/dokter/<%= kunjungan.pasien_id %>">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            Riwayat Pasien
+          </a>
+          <% if (locked && soap) { %>
+            <a href="/resep/dokter/<%= soap.id %>/pdf" target="_blank" class="btn btn-ghost" style="color:var(--ringan); border-color:var(--ringan-soft);">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              Cetak Resep
+            </a>
+          <% } %>
+        </div>
+      </div>
+
+      <% if (kunjungan.alergi || kunjungan.riwayat_kronis) { %>
+        <div class="alergi-banner">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px; color:#f5a623;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <div style="font-size:13.5px;">
+            <% if (kunjungan.alergi) { %><strong>Alergi:</strong> <%= kunjungan.alergi %>.<% } %>
+            <% if (kunjungan.riwayat_kronis) { %> <strong>Riwayat kronis:</strong> <%= kunjungan.riwayat_kronis %>.<% } %>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (locked && soap) { %>
+        <div class="lock-banner">
+          <span style="font-size:13.5px; color:var(--ringan);">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Catatan SOAP terkunci — mode baca saja.
+          </span>
+        </div>
+      <% } %>
+
+      <% if (locals.flash_error) { %><div class="flash error" style="margin-bottom:14px;"><%= flash_error %></div><% } %>
+
+      <form method="POST" action="/soap/<%= kunjungan.id %>/simpan" class="soap-form">
+        <div class="soap-grid">
+
+          <!-- S — Subjective -->
+          <div class="card soap-section span-full">
+            <div class="soap-tag">S — Subjective</div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Keluhan utama (dari pasien, dapat dilengkapi)</label>
+              <textarea class="form-textarea" name="subjektif" <%= locked ? 'readonly' : '' %> style="min-height:80px;"><%= soap ? soap.subjektif : (kunjungan.keluhan_awal || '') %></textarea>
+            </div>
+          </div>
+
+          <!-- O — Objective -->
+          <div class="card soap-section">
+            <div class="soap-tag">O — Objective (tanda vital)</div>
+            <div class="vital-grid">
+              <div class="form-group">
+                <label class="form-label">TD Sistolik</label>
+                <input class="form-input" type="number" name="td_sistolik" value="<%= soap ? (soap.td_sistolik || '') : '' %>" placeholder="120" <%= locked ? 'readonly' : '' %>>
+              </div>
+              <div class="form-group">
+                <label class="form-label">TD Diastolik</label>
+                <input class="form-input" type="number" name="td_diastolik" value="<%= soap ? (soap.td_diastolik || '') : '' %>" placeholder="80" <%= locked ? 'readonly' : '' %>>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nadi (bpm)</label>
+                <input class="form-input" type="number" name="nadi" value="<%= soap ? (soap.nadi || '') : '' %>" placeholder="80" <%= locked ? 'readonly' : '' %>>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Suhu (°C)</label>
+                <input class="form-input" type="number" step="0.1" name="suhu" value="<%= soap ? (soap.suhu || '') : '' %>" placeholder="36.5" <%= locked ? 'readonly' : '' %>>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Frek. Napas</label>
+                <input class="form-input" type="number" name="frekuensi_napas" value="<%= soap ? (soap.frekuensi_napas || '') : '' %>" placeholder="20" <%= locked ? 'readonly' : '' %>>
+              </div>
+              <div class="form-group">
+                <label class="form-label">SpO2 (%)</label>
+                <input class="form-input" type="number" name="spo2" value="<%= soap ? (soap.spo2 || '') : '' %>" placeholder="98" <%= locked ? 'readonly' : '' %>>
+              </div>
+              <div class="form-group">
+                <label class="form-label">BB (kg)</label>
+                <input class="form-input" type="number" step="0.1" name="berat_badan" value="<%= soap ? (soap.berat_badan || '') : '' %>" placeholder="60" <%= locked ? 'readonly' : '' %>>
+              </div>
+              <div class="form-group">
+                <label class="form-label">TB (cm)</label>
+                <input class="form-input" type="number" step="0.1" name="tinggi_badan" value="<%= soap ? (soap.tinggi_badan || '') : '' %>" placeholder="165" <%= locked ? 'readonly' : '' %>>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:4px; margin-bottom:0;">
+              <label class="form-label">Pemeriksaan fisik</label>
+              <textarea class="form-textarea" name="pemeriksaan_fisik" <%= locked ? 'readonly' : '' %> style="min-height:70px;"><%= soap ? (soap.pemeriksaan_fisik || '') : '' %></textarea>
+            </div>
+          </div>
+
+          <!-- A — Assessment -->
+          <div class="card soap-section">
+            <div class="soap-tag">A — Assessment (diagnosis ICD-10)</div>
+            <div class="form-group">
+              <label class="form-label">Diagnosis utama *</label>
+              <input type="hidden" name="kode_dx" id="kode_dx" value="<%= soap ? (soap.kode_dx || '') : '' %>">
+              <div class="icd-wrapper">
+                <input class="form-input" id="icd-search" autocomplete="off"
+                       value="<%= soap && soap.kode_dx ? soap.kode_dx + ' — ' + (soap.dx_desc || '') : '' %>"
+                       placeholder="Ketik kode atau nama penyakit, mis. 'ISPA' atau 'J06'…"
+                       <%= locked ? 'readonly' : '' %>>
+                <div id="icd-results" class="icd-results"></div>
+              </div>
+              <% if (soap && soap.kode_dx) { %>
+                <span class="icd-banding-tag" style="margin-top:6px;"><%= soap.kode_dx %></span>
+              <% } %>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Hasil penunjang / catatan klinis</label>
+              <textarea class="form-textarea" name="hasil_penunjang" <%= locked ? 'readonly' : '' %> style="min-height:70px;"><%= soap ? (soap.hasil_penunjang || '') : '' %></textarea>
+            </div>
+          </div>
+
+          <!-- P — Plan -->
+          <div class="card soap-section span-full">
+            <div class="soap-tag">P — Plan</div>
+            <div class="form-grid" style="margin-bottom:12px;">
+              <div class="form-group">
+                <label class="form-label">Tindakan medis</label>
+                <textarea class="form-textarea" name="tindakan" <%= locked ? 'readonly' : '' %> style="min-height:80px;"><%= soap ? (soap.tindakan || '') : '' %></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Anjuran / edukasi</label>
+                <textarea class="form-textarea" name="anjuran" <%= locked ? 'readonly' : '' %> style="min-height:80px;"><%= soap ? (soap.anjuran || '') : '' %></textarea>
+              </div>
+            </div>
+
+            <label class="form-label">Resep obat</label>
+            <div class="resep-scroll">
+              <% if (locked) { %>
+                <table class="data-table resep-table">
+                  <thead><tr><th>Obat</th><th>Dosis</th><th>Frekuensi</th><th>Durasi</th><th>Jml</th><th>Cara</th></tr></thead>
+                  <tbody>
+                    <% if (!resepList || resepList.length === 0) { %>
+                      <tr><td colspan="6" class="muted" style="text-align:center; padding:20px;">Tidak ada resep.</td></tr>
+                    <% } else { resepList.forEach(function(r) { %>
+                      <tr>
+                        <td><%= r.nama_obat %></td>
+                        <td><%= r.dosis || '—' %></td>
+                        <td><%= r.frekuensi || '—' %></td>
+                        <td><%= r.durasi || '—' %></td>
+                        <td><%= r.jumlah || '—' %></td>
+                        <td><%= r.cara_pakai ? r.cara_pakai.charAt(0).toUpperCase() + r.cara_pakai.slice(1) : '' %></td>
+                      </tr>
+                    <% }); } %>
+                  </tbody>
+                </table>
+              <% } else { %>
+                <datalist id="obat-history">
+                  <% (obatHistory || []).forEach(function(oh) { %>
+                    <option value="<%= oh %>">
+                  <% }); %>
+                </datalist>
+                <table class="data-table resep-table" id="resep-table">
+                  <thead>
+                    <tr>
+                      <th>Nama obat</th>
+                      <th style="width:110px;">Dosis</th>
+                      <th style="width:130px;">Frekuensi</th>
+                      <th style="width:100px;">Durasi</th>
+                      <th style="width:72px;">Jml</th>
+                      <th style="width:120px;">Cara</th>
+                      <th style="width:44px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="resep-body">
+                    <tr class="resep-row">
+                      <td><input class="form-input" name="nama_obat[]" list="obat-history" placeholder="Paracetamol"></td>
+                      <td><input class="form-input" name="dosis[]" placeholder="500 mg"></td>
+                      <td><input class="form-input" name="frekuensi[]" placeholder="3x sehari"></td>
+                      <td><input class="form-input" name="durasi[]" placeholder="5 hari"></td>
+                      <td><input class="form-input" type="number" name="jumlah[]" placeholder="15"></td>
+                      <td>
+                        <select class="form-input" name="cara_pakai[]">
+                          <option value="oral">Oral</option>
+                          <option value="topikal">Topikal</option>
+                          <option value="injeksi">Injeksi</option>
+                          <option value="inhalasi">Inhalasi</option>
+                          <option value="lainnya">Lainnya</option>
+                        </select>
+                      </td>
+                      <td><button type="button" class="btn btn-ghost btn-del-row" style="padding:6px 10px; font-size:16px;">×</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button type="button" class="btn btn-ghost" id="add-resep" style="margin-top:10px;">+ Tambah obat</button>
+              <% } %>
+            </div>
+          </div>
+
+        </div><!-- end soap-grid -->
+
+        <% if (!locked) { %>
+          <div class="soap-actions">
+            <a href="/antrian" class="back-link">Batal</a>
+            <button type="submit" class="btn btn-primary">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Simpan SOAP &amp; selesaikan
+            </button>
+          </div>
+        <% } %>
+      </form>
+    </div>
+  </section>
+</div>
+
+<script>
+(function() {
+  var addBtn   = document.getElementById('add-resep');
+  var body     = document.getElementById('resep-body');
+  var icdInput  = document.getElementById('icd-search');
+  var kodeInput = document.getElementById('kode_dx');
+  var results   = document.getElementById('icd-results');
+
+  if (addBtn) {
+    addBtn.addEventListener('click', function() {
+      var tpl = body.querySelector('.resep-row').cloneNode(true);
+      tpl.querySelectorAll('input, select').forEach(function(el) { el.value = ''; });
+      body.appendChild(tpl);
+    });
+    body.addEventListener('click', function(e) {
+      if (e.target.classList.contains('btn-del-row')) {
+        if (body.querySelectorAll('.resep-row').length > 1) e.target.closest('.resep-row').remove();
+      }
+    });
+  }
+
+  if (icdInput && !icdInput.readOnly) {
+    var timer;
+    icdInput.addEventListener('input', function() {
+      clearTimeout(timer);
+      var q = this.value.trim();
+      if (q.length < 2) { results.innerHTML = ''; results.style.display = 'none'; return; }
+      timer = setTimeout(function() {
+        fetch('/api/icd10?q=' + encodeURIComponent(q))
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            results.innerHTML = '';
+            if (!data.length) { results.style.display = 'none'; return; }
+            data.forEach(function(item) {
+              var li = document.createElement('div');
+              li.className = 'icd-item';
+              li.innerHTML = '<strong>' + item.kode + '</strong> — ' + item.deskripsi;
+              li.addEventListener('click', function() {
+                kodeInput.value = item.kode;
+                icdInput.value  = item.kode + ' — ' + item.deskripsi;
+                results.innerHTML = '';
+                results.style.display = 'none';
+              });
+              results.appendChild(li);
+            });
+            results.style.display = 'block';
+          });
+      }, 280);
+    });
+    document.addEventListener('click', function(e) {
+      if (!icdInput.contains(e.target)) { results.innerHTML = ''; results.style.display = 'none'; }
+    });
+  }
+})();
+</script>
+</body>
+</html>

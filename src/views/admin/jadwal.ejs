@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jadwal Praktek · SEHATI Admin</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<% const isAdmin = user && (user.peran === 'admin' || user.peran === 'super_admin'); %>
+<body>
+<div class="app-shell <%= isAdmin ? 'admin' : '' %>">
+  <aside class="sidebar <%= isAdmin ? 'admin' : '' %>">
+    <div class="sidebar-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+      </span>
+      <div class="brand-text">
+        <% if (isAdmin) { %>SEHATI Admin Portal<% } else { %>SEHATI Front Desk<% } %>
+        <span class="sub"><% if (isAdmin) { %>Akun Staf · Jadwal Praktek<% } else { %>Rekam Medis Elektronik · Rawat Jalan<% } %></span>
+      </div>
+    </div>
+
+    <% if (isAdmin) { %>
+    <div class="sidebar-section" style="color:var(--admin);">Admin</div>
+    <a href="/admin" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Ringkasan
+    </a>
+    <a href="/akun/staf" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      Akun Tenaga Medis
+    </a>
+    <a href="/jadwal" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Jadwal Praktek
+    </a>
+    <a href="/spesialisasi" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      Spesialisasi
+    </a>
+    <% } else { %>
+    <div class="sidebar-section">Front Desk</div>
+    <a href="/kedatangan" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+      Konfirmasi Kedatangan
+    </a>
+    <a href="/jadwal" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Jadwal Dokter
+    </a>
+    <% } %>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="logout-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar sesi
+      </a>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="main-topbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Cari akun, log, jadwal…">
+      </div>
+      <div class="right-tools">
+        <div class="user-chip">
+          <span class="avatar" style="background:#f8eaea; color:var(--admin);"><%= user.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase() %></span>
+          <div>
+            <div class="user-name"><%= user.nama %></div>
+            <div class="user-role">Admin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <% if (locals.flash_success) { %><div class="flash success"><%= flash_success %></div><% } %>
+      <% if (locals.flash_error) { %><div class="flash error"><%= flash_error %></div><% } %>
+
+      <div class="page-head">
+        <div>
+          <div class="meta">Manajemen Jadwal</div>
+          <h1>Jadwal Praktek Dokter</h1>
+        </div>
+      </div>
+
+      <% if (isAdmin) { %>
+      <div class="card card-padded" style="margin-bottom:18px;">
+        <h3 style="margin-bottom:14px;"><%= edit ? 'Edit Jadwal' : 'Tambah Jadwal' %></h3>
+        <form method="POST" action="<%= edit ? '/jadwal/' + edit.id + '/update' : '/jadwal/create' %>" class="form-grid">
+          <% if (edit) { %><input type="hidden" name="_method" value="PUT"><% } %>
+          <div class="form-group span-2">
+            <label class="form-label">Dokter *</label>
+            <select class="form-input" name="id_dokter" required>
+              <option value="">— pilih —</option>
+              <% dokterList.forEach(function(d) { %>
+                <option value="<%= d.id %>" <%= (edit && edit.id_dokter === d.id) ? 'selected' : '' %>>
+                  <%= d.nama_lengkap %><%= d.spesialisasi ? ' — ' + d.spesialisasi : '' %>
+                </option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hari *</label>
+            <select class="form-input" name="hari" required>
+              <% ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'].forEach(function(h) { %>
+                <option value="<%= h %>" <%= (edit && edit.hari === h) ? 'selected' : '' %>><%= h %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jam Mulai *</label>
+            <input class="form-input" type="time" name="jam_mulai" value="<%= edit ? edit.jam_mulai.substring(0,5) : '08:00' %>" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jam Selesai *</label>
+            <input class="form-input" type="time" name="jam_selesai" value="<%= edit ? edit.jam_selesai.substring(0,5) : '12:00' %>" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durasi/pasien (menit)</label>
+            <input class="form-input" type="number" name="durasi_menit" value="<%= edit ? edit.durasi_menit : 15 %>" min="5">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kuota</label>
+            <input class="form-input" type="number" name="kuota" value="<%= edit ? edit.kuota : 12 %>" min="1">
+          </div>
+          <div class="form-actions span-2">
+            <% if (edit) { %><a href="/jadwal" class="back-link">Batal</a><% } %>
+            <button class="btn btn-primary"><%= edit ? 'Simpan' : 'Tambah jadwal' %></button>
+          </div>
+        </form>
+      </div>
+      <% } %>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Dokter</th>
+              <th>Hari</th>
+              <th>Jam</th>
+              <th>Durasi</th>
+              <th>Kuota</th>
+              <th>Status</th>
+              <% if (isAdmin) { %><th>Aksi</th><% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!rows || rows.length === 0) { %>
+              <tr><td colspan="<%= isAdmin ? 7 : 6 %>" class="muted" style="text-align:center; padding:28px;">Belum ada jadwal.</td></tr>
+            <% } else { rows.forEach(function(j) { %>
+              <tr>
+                <td><%= j.dokter %></td>
+                <td><%= j.hari %></td>
+                <td><code style="font-family:var(--font-mono, monospace);"><%= j.jam_mulai.substring(0,5) %>–<%= j.jam_selesai.substring(0,5) %></code></td>
+                <td><%= j.durasi_menit %> mnt</td>
+                <td><%= j.kuota %></td>
+                <td><span class="badge badge-<%= j.status_aktif ? 'ringan' : 'kritis' %>"><%= j.status_aktif ? 'Aktif' : 'Nonaktif' %></span></td>
+                <% if (isAdmin) { %>
+                <td class="aksi-cell" style="white-space:nowrap;">
+                  <a class="back-link" href="/jadwal/<%= j.id %>/edit">Edit</a>
+                  <form method="POST" action="/jadwal/<%= j.id %>/toggle" style="display:inline; margin:0;">
+                    <button class="back-link" style="border:none; cursor:pointer;"><%= j.status_aktif ? 'Nonaktifkan' : 'Aktifkan' %></button>
+                  </form>
+                  <form method="POST" action="/jadwal/<%= j.id %>/delete" style="display:inline; margin:0;" onsubmit="return confirm('Hapus jadwal ini?');">
+                    <button class="back-link" style="border:none; cursor:pointer; color:var(--kritis);">Hapus</button>
+                  </form>
+                </td>
+                <% } %>
+              </tr>
+            <% }); } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

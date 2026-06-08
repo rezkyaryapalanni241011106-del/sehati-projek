@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input Keluhan · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/patient.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="/">
+    <span class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+    </span>
+    <span class="logo-text">SEHATI<span class="sub">RME</span></span>
+  </a>
+  <nav class="topnav">
+    <a href="/pasien/dashboard">Dashboard</a>
+    <a href="/pasien/booking">Booking</a>
+    <a href="/pasien/riwayat">Riwayat</a>
+  </nav>
+  <div class="topbar-user">
+    <span class="chip"><%= user.nama %></span>
+    <a class="back-link" href="/auth/pasien/logout">Keluar</a>
+  </div>
+</header>
+
+<main class="center-page">
+  <div class="keluhan-card">
+    <div class="row-between" style="margin-bottom:20px;">
+      <a href="/pasien/dashboard" class="back-link">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Kembali
+      </a>
+    </div>
+
+    <div class="eyebrow">Pra-Konsultasi</div>
+    <h1 style="font-size:28px; margin-bottom:6px;">Input Keluhan</h1>
+    <p class="muted" style="margin-bottom:20px;">
+      <strong><%= kunjungan.nama_dokter %></strong> —
+      <%= new Date(kunjungan.tanggal).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}) %>
+      jam <%= kunjungan.slot_jam.substring(0,5) %>
+    </p>
+
+    <% if (locals.flash_error) { %><div class="alert alert-warning" style="margin-bottom:16px;"><%= flash_error %></div><% } %>
+    <% if (locals.flash_success) { %><div class="alert alert-success" style="margin-bottom:16px;"><%= flash_success %></div><% } %>
+
+    <% if (kunjungan.status !== 'booked') { %>
+      <div class="alert alert-info" style="margin-bottom:16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <div>Keluhan sudah dikunci karena Anda telah tiba di klinik.</div>
+      </div>
+    <% } %>
+
+    <div class="card card-padded">
+      <form method="POST" action="/keluhan/<%= kunjungan.id %>">
+        <div class="form-group">
+          <label class="form-label" for="keluhan_awal">Keluhan Utama *</label>
+          <div class="textarea-wrap">
+            <textarea id="keluhan_awal" name="keluhan_awal" class="form-textarea"
+                      maxlength="500" rows="5"
+                      <%= kunjungan.status !== 'booked' ? 'readonly' : '' %>
+                      placeholder="Ceritakan keluhan Anda secara singkat dan jelas..."><%= kunjungan.keluhan_awal || '' %></textarea>
+            <div class="char-counter">
+              <span><span id="charCount">0</span>/500 karakter</span>
+              <span id="charHint" class="tiny"></span>
+            </div>
+          </div>
+        </div>
+        <% if (kunjungan.status === 'booked') { %>
+          <div class="form-actions">
+            <a href="/pasien/dashboard" class="btn btn-ghost">Batal</a>
+            <button type="submit" class="btn btn-primary">
+              Simpan Keluhan
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </div>
+        <% } %>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+(function() {
+  const ta = document.getElementById('keluhan_awal');
+  const counter = document.getElementById('charCount');
+  const hint = document.getElementById('charHint');
+  if (!ta) return;
+  function update() {
+    const len = ta.value.length;
+    counter.textContent = len;
+    if (len >= 500) { hint.textContent = 'Batas tercapai'; hint.style.color='var(--kritis)'; }
+    else if (len > 450) { hint.textContent = 'Hampir habis'; hint.style.color='var(--menengah)'; }
+    else { hint.textContent = ''; }
+  }
+  ta.addEventListener('input', update);
+  update();
+})();
+</script>
+</body>
+</html>

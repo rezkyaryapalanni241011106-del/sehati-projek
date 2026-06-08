@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Akun Pasien · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/patient.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="/">
+    <span class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+    </span>
+    <span class="logo-text">SEHATI<span class="sub">RME</span></span>
+  </a>
+  <span class="chip">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+    Klinik SEHATI · Rawat Jalan
+  </span>
+</header>
+
+<main>
+  <div class="container" style="max-width:860px;">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">PORTAL PASIEN · PENDAFTARAN</div>
+        <h1>Daftar Akun Pasien</h1>
+        <p class="muted" style="margin-top:4px;">Nomor HP: <strong><%= nomor_hp %></strong></p>
+      </div>
+    </div>
+
+    <% if (locals.flash_error) { %><div class="flash error"><%= flash_error %></div><% } %>
+
+    <form method="POST" action="/pasien/register">
+      <div class="card card-padded stack-lg" style="margin-bottom:16px;">
+        <div>
+          <div class="eyebrow" style="margin-bottom:12px;">Data Wajib</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap *</label>
+              <input type="text" name="nama_lengkap" class="form-input" required maxlength="200">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Lahir *</label>
+              <input type="date" name="tanggal_lahir" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jenis Kelamin *</label>
+              <select name="jenis_kelamin" class="form-input" required>
+                <option value="">— Pilih —</option>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">NIK (16 digit)</label>
+              <input type="text" name="nik" id="nikInput" class="form-input" maxlength="16" pattern="[0-9]{16}" inputmode="numeric">
+              <div class="form-hint">Kosongkan jika WNA atau bayi</div>
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Alamat *</label>
+              <textarea name="alamat" class="form-textarea" required rows="2" minlength="10"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-padded" id="wna-section" style="display:none; margin-bottom:16px;">
+        <div class="eyebrow" style="margin-bottom:12px;">Khusus WNA / Bayi (Tanpa NIK)</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nomor Paspor</label>
+            <input type="text" name="nomor_paspor" class="form-input" maxlength="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">NIK Wali</label>
+            <input type="text" name="nik_wali" class="form-input" maxlength="16" pattern="[0-9]{16}" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-padded" style="margin-bottom:24px;">
+        <div class="eyebrow" style="margin-bottom:12px;">Data Tambahan (Opsional)</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Pekerjaan</label>
+            <input type="text" name="pekerjaan" class="form-input" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pendidikan</label>
+            <input type="text" name="pendidikan" class="form-input" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status Perkawinan</label>
+            <select name="status_perkawinan" class="form-input">
+              <option value="">— Pilih —</option>
+              <option>Belum Menikah</option>
+              <option>Menikah</option>
+              <option>Duda/Janda</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Agama</label>
+            <select name="agama" class="form-input">
+              <option value="">— Pilih —</option>
+              <option>Islam</option><option>Kristen</option><option>Katolik</option>
+              <option>Hindu</option><option>Buddha</option><option>Konghucu</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Golongan Darah</label>
+            <select name="golongan_darah" class="form-input">
+              <option value="">— Tidak Tahu —</option>
+              <% ['A','B','AB','O','A+','A-','B+','B-','AB+','AB-','O+','O-'].forEach(function(g) { %>
+                <option value="<%= g %>"><%= g %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alergi</label>
+            <textarea name="alergi" class="form-textarea" rows="2" placeholder="Sebutkan alergi obat/makanan jika ada"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Riwayat Penyakit Kronis</label>
+            <textarea name="riwayat_kronis" class="form-textarea" rows="2" placeholder="Hipertensi, Diabetes, dll"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="font-size:16px; padding:14px;">
+        Daftar Sekarang
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </button>
+    </form>
+  </div>
+</main>
+
+<script>
+  document.getElementById('nikInput').addEventListener('input', function() {
+    document.getElementById('wna-section').style.display = this.value ? 'none' : 'block';
+  });
+</script>
+</body>
+</html>

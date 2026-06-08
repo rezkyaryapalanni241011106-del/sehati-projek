@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Kunjungan · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/patient.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="/">
+    <span class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+    </span>
+    <span class="logo-text">SEHATI<span class="sub">RME</span></span>
+  </a>
+  <nav class="topnav">
+    <a href="/pasien/dashboard">Dashboard</a>
+    <a href="/pasien/booking">Booking</a>
+    <a href="/pasien/riwayat" class="active">Riwayat</a>
+  </nav>
+  <div class="topbar-user">
+    <span class="chip"><%= user.nama %></span>
+    <a class="back-link" href="/auth/pasien/logout">Keluar</a>
+  </div>
+</header>
+
+<main>
+  <div class="container" style="max-width:760px;">
+    <a href="/pasien/riwayat" class="back-link" style="display:inline-block; margin-bottom:14px;">← Riwayat</a>
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div class="eyebrow">DETAIL KUNJUNGAN</div>
+        <h1 style="font-size:24px; margin:4px 0;">
+          <%= new Date(kunjungan.tanggal).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) %>
+        </h1>
+        <p class="muted"><%= kunjungan.nama_dokter %> · <%= kunjungan.spesialisasi || '' %></p>
+      </div>
+      <% if (soap) { %>
+        <a class="btn btn-primary" href="/resep/pasien/<%= soap.id %>/pdf" target="_blank">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Unduh Resep PDF
+        </a>
+      <% } %>
+    </div>
+
+    <% if (!soap) { %>
+      <div class="alert alert-info" style="padding:12px 16px; background:#edf5fb; border-left:3px solid #5ba3d4; border-radius:6px;">
+        Catatan medis untuk kunjungan ini belum tersedia.
+      </div>
+    <% } else { %>
+      <div class="card card-padded" style="margin-bottom:16px;">
+        <div style="margin-bottom:14px;">
+          <div class="form-label" style="margin-bottom:6px;">Subjective (keluhan)</div>
+          <div class="muted"><%= soap.subjektif || kunjungan.keluhan_awal || '—' %></div>
+        </div>
+        <hr style="border:none; border-top:1px solid var(--border);">
+        <div style="margin:14px 0;">
+          <div class="form-label" style="margin-bottom:6px;">Objective (tanda vital)</div>
+          <div class="tiny muted">
+            TD <%= soap.td_sistolik || '–' %>/<%= soap.td_diastolik || '–' %> mmHg ·
+            Nadi <%= soap.nadi || '–' %> bpm · Suhu <%= soap.suhu || '–' %> °C
+          </div>
+        </div>
+        <hr style="border:none; border-top:1px solid var(--border);">
+        <div style="margin:14px 0;">
+          <div class="form-label" style="margin-bottom:6px;">Assessment (diagnosis)</div>
+          <div class="muted">
+            <% if (soap.kode_dx) { %>
+              <%= soap.kode_dx %> — <%= soap.dx_label || '' %>
+            <% } else { %>
+              —
+            <% } %>
+          </div>
+        </div>
+        <hr style="border:none; border-top:1px solid var(--border);">
+        <div style="margin-top:14px;">
+          <div class="form-label" style="margin-bottom:6px;">Plan — Tindakan</div>
+          <div class="muted" style="white-space:pre-line;"><%= soap.tindakan || '—' %></div>
+        </div>
+        <% if (soap.anjuran) { %>
+        <hr style="border:none; border-top:1px solid var(--border);">
+        <div style="margin-top:14px;">
+          <div class="form-label" style="margin-bottom:6px;">Plan — Anjuran / Edukasi</div>
+          <div class="muted" style="white-space:pre-line;"><%= soap.anjuran %></div>
+        </div>
+        <% } %>
+      </div>
+
+      <div class="card card-padded">
+        <h3 style="margin-bottom:12px;">Resep Obat</h3>
+        <% if (!resep || resep.length === 0) { %>
+          <p class="muted">Tidak ada resep.</p>
+        <% } else { %>
+          <table class="data-table">
+            <thead>
+              <tr><th>Obat</th><th>Dosis</th><th>Frekuensi</th><th>Durasi</th><th>Cara</th></tr>
+            </thead>
+            <tbody>
+              <% resep.forEach(function(r) { %>
+                <tr>
+                  <td>
+                    <%= r.nama_obat %>
+                    <% if (r.jumlah) { %><span class="tiny muted">×<%= r.jumlah %></span><% } %>
+                  </td>
+                  <td><%= r.dosis %></td>
+                  <td><%= r.frekuensi %></td>
+                  <td><%= r.durasi || '–' %></td>
+                  <td><%= r.cara_pakai ? r.cara_pakai.charAt(0).toUpperCase() + r.cara_pakai.slice(1) : '–' %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</main>
+<footer class="app-footer">SEHATI · Rekam Medis Elektronik Rawat Jalan</footer>
+</body>
+</html>

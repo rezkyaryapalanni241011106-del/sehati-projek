@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jejak Audit · SEHATI Super Admin</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<div class="app-shell admin">
+  <aside class="sidebar admin">
+    <div class="sidebar-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+      </span>
+      <div class="brand-text">
+        SEHATI Super Admin
+        <span class="sub">Audit · Pengawasan · Akun Admin</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section" style="color:var(--admin);">Super Admin</div>
+    <a href="/audit" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+      Overview Sistem
+    </a>
+    <a href="/audit/log" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+      Jejak Audit
+    </a>
+    <a href="/akun/admin" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+      Akun Admin
+    </a>
+    <div class="sidebar-section">Pengawasan (read-only)</div>
+    <a href="/jadwal" class="nav-item">Dashboard Admin</a>
+    <a href="/antrian" class="nav-item">Antrian Dokter</a>
+    <a href="/kedatangan" class="nav-item">Front Desk</a>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="logout-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar sesi
+      </a>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="main-topbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Cari akun, log, jadwal…">
+      </div>
+      <div class="right-tools">
+        <div class="user-chip">
+          <span class="avatar" style="background:#f8eaea; color:var(--admin);"><%= user.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase() %></span>
+          <div>
+            <div class="user-name"><%= user.nama %></div>
+            <div class="user-role">Super Admin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="page-head">
+        <div>
+          <div class="meta">Immutable · append-only</div>
+          <h1>Jejak Audit</h1>
+        </div>
+      </div>
+
+      <form method="GET" action="/audit/log" class="card card-padded" style="margin-bottom:16px;">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Peran</label>
+            <select class="form-input" name="peran">
+              <option value="">Semua</option>
+              <% [['super_admin','Super Admin'],['admin','Admin'],['dokter','Dokter'],['perawat','Perawat'],['resepsionis','Resepsionis'],['pasien','Pasien']].forEach(function(p) { %>
+                <option value="<%= p[0] %>" <%= filter.peran === p[0] ? 'selected' : '' %>><%= p[1] %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Aktivitas</label>
+            <input class="form-input" name="aktivitas" value="<%= filter.aktivitas || '' %>" placeholder="mis. LOGIN, SIMPAN_SOAP">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-input" name="status">
+              <option value="">Semua</option>
+              <option value="sukses" <%= filter.status === 'sukses' ? 'selected' : '' %>>Sukses</option>
+              <option value="gagal" <%= filter.status === 'gagal' ? 'selected' : '' %>>Gagal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal</label>
+            <input class="form-input" type="date" name="tanggal" value="<%= filter.tanggal || '' %>">
+          </div>
+          <div class="form-actions span-2">
+            <a href="/audit/log" class="back-link">Reset</a>
+            <button class="btn btn-primary">Filter</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Peran</th>
+              <th>Aktivitas</th>
+              <th>Target</th>
+              <th>IP</th>
+              <th>Status</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!rows || rows.length === 0) { %>
+              <tr><td colspan="7" class="muted" style="text-align:center; padding:28px;">Tidak ada log sesuai filter.</td></tr>
+            <% } else { rows.forEach(function(r) { %>
+              <tr>
+                <td class="tiny muted" style="white-space:nowrap;"><%= new Date(r.waktu).toLocaleString('id-ID', {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}) %></td>
+                <td class="tiny"><%= r.peran_user %></td>
+                <td><%= r.aktivitas %></td>
+                <td class="tiny muted"><%= r.tabel_target || '—' %></td>
+                <td class="tiny muted"><%= r.ip_address || '—' %></td>
+                <td><span class="badge badge-<%= r.status === 'sukses' ? 'ringan' : 'kritis' %>"><%= r.status %></span></td>
+                <td class="tiny muted"><%= r.keterangan || '' %></td>
+              </tr>
+            <% }); } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

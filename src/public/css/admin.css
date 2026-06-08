@@ -1,0 +1,17 @@
+/* ============================================================================
+   SEHATI — Admin Portal (Maroon accent, audit-focused)
+   ============================================================================ */
+
+.app-shell.admin {
+  --accent: var(--admin);
+  --accent-hover: var(--admin-hover);
+  --accent-soft: var(--admin-bg);
+}
+
+.sidebar.admin .logo-mark { background: var(--admin); }
+.sidebar.admin .nav-item.active {
+  background: var(--admin-bg);
+  color: var(--admin);
+}
+
+.sidebar.admin .sidebar-section { color: var(--ink-muted); }

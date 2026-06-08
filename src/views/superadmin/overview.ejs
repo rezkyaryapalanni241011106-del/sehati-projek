@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overview Sistem · SEHATI Super Admin</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+  <style>
+    .stat-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:24px; }
+    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px 18px; }
+    .stat-label { font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .stat-value { font-size:32px; font-weight:700; line-height:1; }
+    .stat-sub { font-size:12px; color:var(--ink-soft); margin-top:4px; }
+    .stat-value.green { color: #16a34a; }
+    .stat-value.red   { color: var(--kritis); }
+    .stat-value.blue  { color: var(--accent); }
+    .section-title { font-size:14px; font-weight:600; margin-bottom:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; }
+  </style>
+</head>
+<body>
+<div class="app-shell admin">
+  <aside class="sidebar admin">
+    <div class="sidebar-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+      </span>
+      <div class="brand-text">
+        SEHATI Super Admin
+        <span class="sub">Audit · Pengawasan · Akun Admin</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section" style="color:var(--admin);">Super Admin</div>
+    <a href="/audit" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+      Overview Sistem
+    </a>
+    <a href="/audit/log" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+      Jejak Audit
+    </a>
+    <a href="/akun/admin" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+      Akun Admin
+    </a>
+    <div class="sidebar-section">Pengawasan (read-only)</div>
+    <a href="/jadwal" class="nav-item">Dashboard Admin</a>
+    <a href="/antrian" class="nav-item">Antrian Dokter</a>
+    <a href="/kedatangan" class="nav-item">Front Desk</a>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="logout-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar sesi
+      </a>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="main-topbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Cari akun, log, jadwal…">
+      </div>
+      <div class="right-tools">
+        <div class="user-chip">
+          <span class="avatar" style="background:#f8eaea; color:var(--admin);"><%= user.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase() %></span>
+          <div>
+            <div class="user-name"><%= user.nama %></div>
+            <div class="user-role">Super Admin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <% if (locals.flash_success) { %><div class="flash success"><%= flash_success %></div><% } %>
+      <% if (locals.flash_error) { %><div class="flash error"><%= flash_error %></div><% } %>
+
+      <div class="page-head">
+        <div>
+          <div class="meta">Ringkasan real-time</div>
+          <h1>Overview Sistem</h1>
+        </div>
+      </div>
+
+      <!-- Kunjungan Hari Ini -->
+      <p class="section-title">Kunjungan Hari Ini</p>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total</div>
+          <div class="stat-value blue"><%= kunjunganHariIni.total || 0 %></div>
+          <div class="stat-sub">kunjungan terdaftar</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Terjadwal</div>
+          <div class="stat-value"><%= kunjunganHariIni.booked || 0 %></div>
+          <div class="stat-sub">menunggu konfirmasi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Hadir</div>
+          <div class="stat-value green"><%= kunjunganHariIni.hadir || 0 %></div>
+          <div class="stat-sub">sudah dikonfirmasi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Selesai</div>
+          <div class="stat-value green"><%= kunjunganHariIni.selesai || 0 %></div>
+          <div class="stat-sub">SOAP sudah diisi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Dibatalkan</div>
+          <div class="stat-value red"><%= kunjunganHariIni.batal || 0 %></div>
+          <div class="stat-sub">hari ini</div>
+        </div>
+      </div>
+
+      <!-- Data Sistem -->
+      <p class="section-title">Data Sistem</p>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Pasien</div>
+          <div class="stat-value blue"><%= pasienStats.total || 0 %></div>
+          <div class="stat-sub">terdaftar</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Kunjungan Bulan Ini</div>
+          <div class="stat-value"><%= kunjunganBulanIni.total || 0 %></div>
+          <div class="stat-sub">bulan berjalan</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Aktivitas Hari Ini</div>
+          <div class="stat-value"><%= auditHariIni.total || 0 %></div>
+          <div class="stat-sub">
+            <% if (auditHariIni.gagal > 0) { %>
+              <span style="color:var(--kritis)"><%= auditHariIni.gagal %> gagal</span>
+            <% } else { %>
+              semua sukses
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Staf per Peran -->
+      <p class="section-title">Staf Aktif per Peran</p>
+      <div class="stat-grid">
+        <% stafStats.forEach(function(s) { %>
+          <div class="stat-card">
+            <div class="stat-label"><%= s.peran.replace('_', ' ') %></div>
+            <div class="stat-value"><%= s.aktif || 0 %></div>
+            <div class="stat-sub">dari <%= s.total %> akun</div>
+          </div>
+        <% }); %>
+      </div>
+
+      <!-- Aktivitas Terbaru -->
+      <p class="section-title">Aktivitas Terbaru</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>User</th>
+              <th>Peran</th>
+              <th>Aktivitas</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!aktivitasTerbaru || aktivitasTerbaru.length === 0) { %>
+              <tr><td colspan="5" class="muted" style="text-align:center; padding:28px;">Belum ada aktivitas hari ini.</td></tr>
+            <% } else { aktivitasTerbaru.forEach(function(a) { %>
+              <tr>
+                <td class="tiny"><%= new Date(a.waktu).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit' }) %></td>
+                <td><%= a.username || '—' %></td>
+                <td class="tiny muted"><%= a.peran_user || '—' %></td>
+                <td><%= a.aktivitas %></td>
+                <td><span class="badge badge-<%= a.status === 'sukses' ? 'ringan' : 'kritis' %>"><%= a.status %></span></td>
+              </tr>
+            <% }); } %>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px; text-align:right;">
+        <a href="/audit/log" class="back-link">Lihat semua jejak audit →</a>
+      </div>
+
+    </div>
+  </section>
+</div>
+</body>
+</html>

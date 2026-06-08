@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akun Tenaga Medis · SEHATI Admin</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<div class="app-shell admin">
+  <aside class="sidebar admin">
+    <div class="sidebar-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+      </span>
+      <div class="brand-text">
+        SEHATI Admin Portal
+        <span class="sub">Akun Staf · Jadwal Praktek</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section" style="color:var(--admin);">Admin</div>
+    <a href="/admin" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Ringkasan
+    </a>
+    <a href="/akun/staf" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      Akun Tenaga Medis
+    </a>
+    <a href="/jadwal" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Jadwal Praktek
+    </a>
+    <a href="/spesialisasi" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      Spesialisasi
+    </a>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="logout-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar sesi
+      </a>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="main-topbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Cari akun, log, jadwal…">
+      </div>
+      <div class="right-tools">
+        <div class="user-chip">
+          <span class="avatar" style="background:#f8eaea; color:var(--admin);"><%= user.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase() %></span>
+          <div>
+            <div class="user-name"><%= user.nama %></div>
+            <div class="user-role">Admin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <% if (locals.flash_success) { %><div class="flash success"><%= flash_success %></div><% } %>
+      <% if (locals.flash_error) { %><div class="flash error"><%= flash_error %></div><% } %>
+
+      <div class="page-head">
+        <div>
+          <div class="meta">Manajemen Akun</div>
+          <h1>Akun Tenaga Medis</h1>
+        </div>
+      </div>
+
+      <div class="card card-padded" style="margin-bottom:18px;">
+        <h3 style="margin-bottom:14px;"><%= edit ? 'Edit Akun' : 'Tambah Akun Baru' %></h3>
+        <form method="POST" action="<%= edit ? '/akun/staf/' + edit.id + '/update' : '/akun/staf' %>" class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Username *</label>
+            <input class="form-input" name="username" value="<%= edit ? edit.username : '' %>" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nama lengkap *</label>
+            <input class="form-input" name="nama_lengkap" value="<%= edit ? edit.nama_lengkap : '' %>" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input class="form-input" type="email" name="email" value="<%= edit ? edit.email : '' %>" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor HP</label>
+            <input class="form-input" name="nomor_hp" value="<%= edit ? (edit.nomor_hp || '') : '' %>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Peran *</label>
+            <select class="form-input" name="peran" required>
+              <% [['dokter','Dokter'],['perawat','Perawat'],['resepsionis','Resepsionis']].forEach(function(pr) { %>
+                <option value="<%= pr[0] %>" <%= (edit && edit.peran === pr[0]) ? 'selected' : '' %>><%= pr[1] %></option>
+              <% }); %>
+            </select>
+          </div>
+          <% if (!edit) { %>
+          <div class="form-group">
+            <label class="form-label">Password awal</label>
+            <input class="form-input" name="password_custom" placeholder="kosong = auto-generate">
+          </div>
+          <% } %>
+          <div class="form-group">
+            <label class="form-label">
+              Spesialisasi (dokter) · <a class="back-link" href="/spesialisasi" style="font-weight:500;">Kelola daftar</a>
+            </label>
+            <div class="combo" id="spsCombo">
+              <input type="hidden" name="spesialisasi" id="spsValue" value="<%= edit ? (edit.spesialisasi || '') : '' %>">
+              <button type="button" class="form-input combo-trigger" id="spsTrigger" style="text-align:left; display:flex; justify-content:space-between; align-items:center; height:auto;">
+                <span id="spsLabel" style="<%= (edit && edit.spesialisasi) ? '' : 'color:var(--ink-soft);' %>"><%= (edit && edit.spesialisasi_nama) ? edit.spesialisasi_nama : '— Pilih spesialisasi —' %></span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="combo-panel" id="spsPanel" hidden>
+                <input type="text" class="combo-search" id="spsSearch" placeholder="Cari spesialisasi…" autocomplete="off">
+                <ul class="combo-list" id="spsList">
+                  <li class="combo-option" data-value="">— Pilih spesialisasi —</li>
+                  <% spesialisasiList.forEach(function(sp) { %>
+                    <li class="combo-option" data-value="<%= sp.id %>"><%= sp.nama %></li>
+                  <% }); %>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor STR (dokter)</label>
+            <input class="form-input" name="nomor_str" value="<%= edit ? (edit.nomor_str || '') : '' %>">
+          </div>
+          <div class="form-actions span-2">
+            <% if (edit) { %><a href="/akun/staf" class="back-link">Batal</a><% } %>
+            <button class="btn btn-primary"><%= edit ? 'Simpan perubahan' : 'Tambah akun' %></button>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Nama</th><th>Username</th><th>Peran</th><th>Email</th><th>Status</th><th>Aksi</th></tr>
+          </thead>
+          <tbody>
+            <% users.forEach(function(u) { %>
+              <tr>
+                <td>
+                  <%= u.nama_lengkap %>
+                  <% if (u.spesialisasi_nama) { %><div class="tiny muted"><%= u.spesialisasi_nama %><%= u.nomor_str ? ' · STR ' + u.nomor_str : '' %></div><% } %>
+                </td>
+                <td class="tiny"><%= u.username %></td>
+                <td><span class="badge badge-menengah"><%= u.peran === 'dokter' ? 'Dokter' : u.peran === 'perawat' ? 'Perawat' : 'Resepsionis' %></span></td>
+                <td class="tiny muted"><%= u.email %></td>
+                <td><span class="badge badge-<%= u.status_aktif ? 'ringan' : 'kritis' %>"><%= u.status_aktif ? 'Aktif' : 'Nonaktif' %></span></td>
+                <td class="aksi-cell" style="white-space:nowrap;">
+                  <a class="back-link" href="/akun/staf/<%= u.id %>/edit">Edit</a>
+                  <form method="POST" action="/akun/staf/<%= u.id %>/toggle" style="display:inline; margin:0;">
+                    <button class="back-link" style="border:none; cursor:pointer;"><%= u.status_aktif ? 'Nonaktifkan' : 'Aktifkan' %></button>
+                  </form>
+                  <button class="back-link" style="border:none; cursor:pointer; background:none;"
+                    onclick="bukaModalReset('<%= u.id %>', '<%= u.nama_lengkap %>')">Reset PW</button>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal Reset Password -->
+<div id="modalReset" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:999; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:12px; padding:28px 32px; width:100%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,.18);">
+    <h3 style="margin:0 0 4px;">Reset Password</h3>
+    <p id="modalResetNama" style="margin:0 0 20px; color:var(--ink-soft); font-size:14px;"></p>
+    <form id="formModalReset" method="POST" action="">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Password baru</label>
+        <input class="form-input" type="text" name="password_custom" id="modalResetInput"
+          placeholder="kosong = auto-generate" autocomplete="new-password">
+        <div style="font-size:12px; color:var(--ink-soft); margin-top:6px;">Kosongkan untuk generate password acak otomatis.</div>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button type="button" class="btn" style="background:var(--bg-soft);" onclick="tutupModalReset()">Batal</button>
+        <button type="submit" class="btn btn-primary">Reset Password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function() {
+  var trigger = document.getElementById('spsTrigger');
+  var panel   = document.getElementById('spsPanel');
+  var search  = document.getElementById('spsSearch');
+  var list    = document.getElementById('spsList');
+  var val     = document.getElementById('spsValue');
+  var label   = document.getElementById('spsLabel');
+
+  if (!trigger) return;
+
+  trigger.addEventListener('click', function() {
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) search.focus();
+  });
+
+  search.addEventListener('input', function() {
+    var q = this.value.toLowerCase();
+    list.querySelectorAll('.combo-option').forEach(function(li) {
+      li.style.display = li.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+
+  list.addEventListener('click', function(e) {
+    var li = e.target.closest('.combo-option');
+    if (!li) return;
+    val.value = li.dataset.value;
+    label.textContent = li.textContent;
+    label.style.color = li.dataset.value === '' ? 'var(--ink-soft)' : '';
+    panel.hidden = true;
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('spsCombo').contains(e.target)) panel.hidden = true;
+  });
+})();
+
+function bukaModalReset(id, nama) {
+  document.getElementById('formModalReset').action = '/akun/staf/' + id + '/reset-password';
+  document.getElementById('modalResetNama').textContent = 'Akun: ' + nama;
+  document.getElementById('modalResetInput').value = '';
+  var modal = document.getElementById('modalReset');
+  modal.style.display = 'flex';
+  document.getElementById('modalResetInput').focus();
+}
+function tutupModalReset() {
+  document.getElementById('modalReset').style.display = 'none';
+}
+document.getElementById('modalReset').addEventListener('click', function(e) {
+  if (e.target === this) tutupModalReset();
+});
+</script>
+</body>
+</html>

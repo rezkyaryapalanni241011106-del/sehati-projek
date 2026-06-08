@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — <%= app_name %></title>
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body class="layout-app">
+  <%- include('./partials/navbar') %>
+  <div class="container">
+    <%- include('./partials/flash') %>
+    <%- body %>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <% if (locals.extraScripts) { %>
+    <% extraScripts.forEach(s => { %>
+      <script src="/public/js/<%= s %>"></script>
+    <% }) %>
+  <% } %>
+</body>
+</html>

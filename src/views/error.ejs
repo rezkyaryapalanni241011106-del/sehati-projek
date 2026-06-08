@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= statusCode || 500 %> · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/patient.css">
+  <style>
+    .error-page { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; padding:40px 20px; }
+    .error-code { font-size:72px; font-weight:800; color:var(--accent); line-height:1; margin-bottom:12px; }
+    .error-title { font-size:22px; font-weight:600; margin-bottom:10px; }
+    .error-msg { color:var(--ink-soft); max-width:480px; font-size:15px; margin-bottom:28px; }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="/">
+    <span class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+    </span>
+    <span class="logo-text">SEHATI<span class="sub">RME</span></span>
+  </a>
+</header>
+
+<main>
+  <div class="error-page">
+    <div class="error-code"><%= statusCode || 500 %></div>
+    <div class="error-title">
+      <% if (statusCode === 404) { %>Halaman tidak ditemukan
+      <% } else if (statusCode === 403) { %>Akses ditolak
+      <% } else if (statusCode === 401) { %>Silakan masuk terlebih dahulu
+      <% } else { %>Terjadi Kesalahan<% } %>
+    </div>
+    <div class="error-msg">
+      <%= message || 'Maaf, terjadi kesalahan. Silakan coba lagi atau hubungi administrator.' %>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <a href="/" class="btn btn-primary">Kembali ke Beranda</a>
+      <% if (statusCode === 401 || statusCode === 403) { %>
+        <a href="/auth/login" class="btn btn-ghost">Masuk</a>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<footer class="app-footer">SEHATI · Rekam Medis Elektronik Rawat Jalan</footer>
+</body>
+</html>

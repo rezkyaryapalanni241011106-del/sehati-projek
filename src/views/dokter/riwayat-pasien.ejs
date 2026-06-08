@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riwayat Pasien · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+      </span>
+      <div class="brand-text">
+        SEHATI Klinis
+        <span class="sub">Rekam Medis Elektronik · Rawat Jalan</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">Konsultasi</div>
+    <a href="/antrian" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Antrian Hari Ini
+    </a>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="logout-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar sesi
+      </a>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="main-topbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Cari pasien, nomor RM…">
+      </div>
+      <div class="right-tools">
+        <div class="user-chip">
+          <span class="avatar"><%= user.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase() %></span>
+          <div>
+            <div class="user-name"><%= user.nama %></div>
+            <div class="user-role">Dokter</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <a href="/antrian" class="back-link" style="display:inline-block; margin-bottom:14px;">← Antrian</a>
+
+      <div class="page-head">
+        <div>
+          <div class="meta">No. RM <%= pasien.nomor_rm %> · <%= hitungUsia(pasien.tanggal_lahir) %> th · <%= pasien.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' %></div>
+          <h1><%= pasien.nama_lengkap %></h1>
+        </div>
+      </div>
+
+      <% if (pasien.alergi || pasien.riwayat_kronis) { %>
+        <div style="margin-bottom:14px; padding:12px 16px; background:#fff8ec; border-left:3px solid #f5a623; border-radius:6px;">
+          <% if (pasien.alergi) { %><b>Alergi:</b> <%= pasien.alergi %>. <% } %>
+          <% if (pasien.riwayat_kronis) { %><b>Riwayat kronis:</b> <%= pasien.riwayat_kronis %>.<% } %>
+        </div>
+      <% } %>
+
+      <h3 style="margin-bottom:12px;">Riwayat Kunjungan (<%= kunjungans.length %>)</h3>
+
+      <% if (!kunjungans || kunjungans.length === 0) { %>
+        <div class="card card-padded muted">Belum ada kunjungan.</div>
+      <% } else { kunjungans.forEach(function(k) { %>
+        <div class="card card-padded" style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <b><%= new Date(k.tanggal).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) %></b>
+            <% const bm = {booked:'menengah', hadir:'menengah', selesai:'ringan', batal:'kritis', skip:'muted'}; %>
+            <span class="badge badge-<%= bm[k.status] || 'muted' %>"><%= k.status %></span>
+          </div>
+          <% if (k.soap_id) { %>
+            <div class="tiny muted" style="line-height:1.8;">
+              <b>Dx:</b> <%= k.kode_dx ? k.kode_dx + ' — ' + (k.dx_label || '') : '—' %><br>
+              <b>Vital:</b> TD <%= k.td_sistolik || '–' %>/<%= k.td_diastolik || '–' %> · Nadi <%= k.nadi || '–' %> · Suhu <%= k.suhu || '–' %>°C<br>
+              <b>Plan:</b> <%= k.tindakan || '—' %>
+            </div>
+          <% } else { %>
+            <div class="tiny muted">Tidak ada catatan SOAP.</div>
+          <% } %>
+        </div>
+      <% }); } %>
+    </div>
+  </section>
+</div>
+</body>
+</html>

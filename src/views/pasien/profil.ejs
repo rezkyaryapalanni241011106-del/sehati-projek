@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Saya · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/patient.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="/">
+    <span class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+    </span>
+    <span class="logo-text">SEHATI<span class="sub">RME</span></span>
+  </a>
+  <nav class="topnav">
+    <a href="/pasien/dashboard">Dashboard</a>
+    <a href="/pasien/booking">Booking</a>
+    <a href="/pasien/riwayat">Riwayat</a>
+  </nav>
+  <div class="topbar-user">
+    <span class="chip"><%= user.nama %></span>
+    <a class="back-link" href="/auth/pasien/logout">Keluar</a>
+  </div>
+</header>
+
+<main>
+  <div class="container" style="max-width:760px;">
+    <a href="/pasien/dashboard" class="back-link" style="display:inline-block; margin-bottom:14px;">← Dashboard</a>
+
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">PORTAL PASIEN</div>
+        <h1>Profil Saya</h1>
+        <p class="muted" style="margin-top:4px;">No. RM: <code style="font-family:monospace;"><%= pasien.nomor_rm %></code></p>
+      </div>
+    </div>
+
+    <% if (locals.flash_success) { %><div class="flash success" style="margin-bottom:16px;"><%= flash_success %></div><% } %>
+    <% if (locals.flash_error) { %><div class="flash error" style="margin-bottom:16px;"><%= flash_error %></div><% } %>
+
+    <div class="card card-padded" style="margin-bottom:16px;">
+      <div class="eyebrow" style="margin-bottom:12px;">Data Identitas</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px 20px;">
+        <div>
+          <div class="form-label">Nama Lengkap</div>
+          <div><%= pasien.nama_lengkap %></div>
+        </div>
+        <div>
+          <div class="form-label">Tanggal Lahir</div>
+          <div><%= new Date(pasien.tanggal_lahir).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}) %></div>
+        </div>
+        <div>
+          <div class="form-label">Jenis Kelamin</div>
+          <div><%= pasien.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' %></div>
+        </div>
+        <div>
+          <div class="form-label">Nomor HP</div>
+          <div><%= pasien.nomor_hp %></div>
+        </div>
+        <% if (pasien.nik) { %>
+        <div>
+          <div class="form-label">NIK</div>
+          <div><code style="font-family:monospace; font-size:13px;"><%= pasien.nik %></code></div>
+        </div>
+        <% } %>
+        <div class="span-full" style="grid-column:1 / -1;">
+          <div class="form-label">Alamat</div>
+          <div><%= pasien.alamat %></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-padded" style="margin-bottom:16px;">
+      <div class="eyebrow" style="margin-bottom:12px;">Data Medis</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px 20px;">
+        <div>
+          <div class="form-label">Golongan Darah</div>
+          <div><%= pasien.golongan_darah || '—' %></div>
+        </div>
+        <div>
+          <div class="form-label">Alergi</div>
+          <div><%= pasien.alergi || '—' %></div>
+        </div>
+        <div>
+          <div class="form-label">Riwayat Penyakit Kronis</div>
+          <div><%= pasien.riwayat_kronis || '—' %></div>
+        </div>
+      </div>
+    </div>
+
+    <% if (pasien.pekerjaan || pasien.pendidikan || pasien.status_perkawinan || pasien.agama) { %>
+    <div class="card card-padded">
+      <div class="eyebrow" style="margin-bottom:12px;">Data Sosial</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px 20px;">
+        <% if (pasien.pekerjaan) { %>
+        <div><div class="form-label">Pekerjaan</div><div><%= pasien.pekerjaan %></div></div>
+        <% } %>
+        <% if (pasien.pendidikan) { %>
+        <div><div class="form-label">Pendidikan</div><div><%= pasien.pendidikan %></div></div>
+        <% } %>
+        <% if (pasien.status_perkawinan) { %>
+        <div><div class="form-label">Status Perkawinan</div><div><%= pasien.status_perkawinan %></div></div>
+        <% } %>
+        <% if (pasien.agama) { %>
+        <div><div class="form-label">Agama</div><div><%= pasien.agama %></div></div>
+        <% } %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</main>
+<footer class="app-footer">SEHATI · Rekam Medis Elektronik Rawat Jalan</footer>
+</body>
+</html>

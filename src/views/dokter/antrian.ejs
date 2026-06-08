@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antrian Hari Ini · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+  <style>
+    .greeting-date {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 6px;
+    }
+    .greeting-h1 {
+      font-size: 36px;
+      letter-spacing: -0.02em;
+      margin-bottom: 0;
+    }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ringan);
+      letter-spacing: 0.06em;
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--ringan);
+      box-shadow: 0 0 0 3px rgba(21,128,61,.18);
+      flex-shrink: 0;
+    }
+    .polling-label {
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-left: 4px;
+    }
+    .section-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .section-head h3 { font-size: 15px; margin: 0; }
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: var(--ink-muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+      </span>
+      <div class="brand-text">
+        SEHATI Klinis
+        <span class="sub">Rekam Medis Elektronik · Rawat Jalan</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">Konsultasi</div>
+    <a href="/antrian" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Antrian Hari Ini
+    </a>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="logout-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Keluar sesi
+      </a>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="main-topbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Cari pasien, nomor RM…">
+      </div>
+      <div class="right-tools">
+        <div class="user-chip">
+          <span class="avatar"><%= user.nama.split(' ').map(function(w){return w[0]}).join('').substring(0,2).toUpperCase() %></span>
+          <div>
+            <div class="user-name"><%= user.nama %></div>
+            <div class="user-role">Dokter<% if (locals.spesialisasi_nama) { %> · <%= spesialisasi_nama %><% } %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <% if (locals.flash_success) { %><div class="flash success"><%= flash_success %></div><% } %>
+      <% if (locals.flash_error) { %><div class="flash error"><%= flash_error %></div><% } %>
+
+      <%
+        var now = new Date();
+        var hariList = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+        var bulanList = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        var tglLabel = hariList[now.getDay()].toUpperCase() + ', ' +
+                       now.getDate() + ' ' + bulanList[now.getMonth()].toUpperCase() + ' ' + now.getFullYear() +
+                       ' · PUKUL ' + String(now.getHours()).padStart(2,'0') + '.' + String(now.getMinutes()).padStart(2,'0');
+        var firstName = user.nama.split(' ')[0];
+      %>
+
+      <div style="margin-bottom:24px;">
+        <div class="greeting-date"><%= tglLabel %></div>
+        <h1 class="greeting-h1">Selamat bertugas, <%= firstName %>.</h1>
+      </div>
+
+      <div class="kpi-row" style="margin-bottom:24px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Antri (Hadir)</div>
+          <div class="kpi-value"><%= antrian.length %></div>
+          <div class="kpi-meta">Menunggu dipanggil</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Selesai Hari Ini</div>
+          <div class="kpi-value" style="color:var(--ringan);"><%= jumlah_selesai %></div>
+          <div class="kpi-meta">Konsultasi tuntas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Belum Hadir</div>
+          <div class="kpi-value"><%= jumlah_booked %></div>
+          <div class="kpi-meta">Booked, belum check-in</div>
+        </div>
+      </div>
+
+      <div class="section-wrap">
+        <div class="section-head">
+          <h3>Antrian Pasien Hadir</h3>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+            <span class="polling-label" id="pollingLabel">Polling 30s</span>
+          </div>
+        </div>
+        <% if (antrian.length === 0) { %>
+          <div class="empty-state" id="emptyMsg">Belum ada pasien hadir di antrian.</div>
+        <% } else { %>
+        <table class="data-table" id="antrianTable">
+          <thead>
+            <tr>
+              <th style="width:48px;">#</th>
+              <th>Pasien</th>
+              <th style="width:100px;">Hadir</th>
+              <th>Keluhan Awal</th>
+              <th style="width:130px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="antrianBody">
+            <% antrian.forEach(function(k, i) { %>
+            <tr id="antrian-<%= k.id %>">
+              <td class="row-no" style="color:var(--ink-muted); font-size:13px;"><%= i + 1 %></td>
+              <td>
+                <div class="pasien-info">
+                  <div class="nama"><%= k.nama_pasien %></div>
+                  <div class="id"><%= k.nomor_rm %> · <%= k.usia %> thn</div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono); font-size:13px; color:var(--ink-soft);">
+                <%= k.waktu_konfirmasi ? new Date(k.waktu_konfirmasi).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '—' %>
+              </td>
+              <td style="font-size:13px; color:var(--ink-soft); max-width:280px;">
+                <%= k.keluhan_awal ? k.keluhan_awal.substring(0,60) + (k.keluhan_awal.length > 60 ? '…' : '') : '<em style="color:var(--ink-muted);">Tidak ada keluhan</em>' %>
+              </td>
+              <td class="aksi-cell" style="display:flex; gap:6px; align-items:center; padding-top:12px; padding-bottom:12px;">
+                <a href="/soap/<%= k.id %>" class="btn btn-primary btn-sm">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                  Panggil
+                </a>
+                <button class="btn btn-ghost btn-sm btn-skip" data-id="<%= k.id %>">Skip</button>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        <% } %>
+      </div>
+
+      <% if (standby.length > 0) { %>
+      <div class="section-wrap">
+        <div class="section-head">
+          <h3>Standby — Dilewati</h3>
+          <span class="tiny muted"><%= standby.length %> pasien</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Pasien</th>
+              <th>Alasan Skip</th>
+              <th style="width:130px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% standby.forEach(function(k) { %>
+            <tr id="standby-<%= k.id %>">
+              <td>
+                <div class="pasien-info">
+                  <div class="nama"><%= k.nama_pasien %></div>
+                  <div class="id"><%= k.nomor_rm %> · <%= k.usia %> thn</div>
+                </div>
+              </td>
+              <td style="font-size:13px; color:var(--ink-soft);"><%= k.alasan_skip || '—' %></td>
+              <td class="aksi-cell">
+                <button class="btn btn-ghost btn-sm btn-standby-back" data-id="<%= k.id %>">↩ Kembalikan</button>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+    </div>
+  </section>
+</div>
+
+<!-- Modal Skip -->
+<div id="skipModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Skip Pasien</h3>
+    <p class="muted" style="margin-bottom:16px;">Pasien akan dipindahkan ke daftar standby.</p>
+    <div class="form-group">
+      <label class="form-label">Alasan Skip *</label>
+      <textarea id="alasanSkip" class="form-textarea" rows="3" placeholder="Wajib diisi…"></textarea>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button onclick="document.getElementById('skipModal').classList.remove('open')" class="btn btn-ghost">Batal</button>
+      <button id="btnSkipConfirm" class="btn btn-danger">Konfirmasi Skip</button>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>const DOCTOR_ID = '<%= dokterId %>';</script>
+<script src="/public/js/queue.js"></script>
+<script>
+(function() {
+  let skipTargetId = null;
+
+  document.querySelectorAll('.btn-skip').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      skipTargetId = this.dataset.id;
+      document.getElementById('alasanSkip').value = '';
+      document.getElementById('skipModal').classList.add('open');
+    });
+  });
+
+  document.getElementById('btnSkipConfirm').addEventListener('click', async function() {
+    const alasan = document.getElementById('alasanSkip').value.trim();
+    if (!alasan) { alert('Alasan skip wajib diisi.'); return; }
+    const r = await fetch('/antrian/' + skipTargetId + '/skip', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ alasan_skip: alasan })
+    });
+    const data = await r.json();
+    if (data.ok) {
+      document.getElementById('skipModal').classList.remove('open');
+      window.location.reload();
+    } else {
+      alert(data.message || 'Gagal skip.');
+    }
+  });
+
+  document.querySelectorAll('.btn-standby-back').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      const r = await fetch('/antrian/' + this.dataset.id + '/standby-back', { method: 'POST' });
+      const data = await r.json();
+      if (data.ok) window.location.reload();
+    });
+  });
+
+  // Countdown polling label
+  var countdown = 30;
+  var label = document.getElementById('pollingLabel');
+  if (label) {
+    setInterval(function() {
+      countdown--;
+      if (countdown <= 0) countdown = 30;
+      label.textContent = 'Polling ' + countdown + 's';
+    }, 1000);
+  }
+})();
+</script>
+</body>
+</html>
