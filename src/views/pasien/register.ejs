@@ -32,6 +32,7 @@
       </div>
     </div>
 
+    <% if (locals.flash_info) { %><div class="flash success" style="background:var(--bg-soft); border-left:3px solid var(--accent);"><%= flash_info %></div><% } %>
     <% if (locals.flash_error) { %><div class="flash error"><%= flash_error %></div><% } %>
 
     <form method="POST" action="/pasien/register">

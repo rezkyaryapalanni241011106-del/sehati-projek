@@ -39,7 +39,7 @@
     <% if (locals.otp_mock_kode) { %>
       <div class="alert alert-demo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-        <div><b>Mode Demo:</b> Kode OTP Anda adalah <b style="font-size:18px; letter-spacing:0.1em;"><%= otp_mock_kode %></b></div>
+        <div><b>Mode Demo:</b> Kode OTP Anda adalah <b id="demoCode" style="font-size:18px; letter-spacing:0.1em; text-decoration:underline dotted;"><%= otp_mock_kode %></b> <span style="font-size:12px; opacity:0.7;">(klik untuk isi otomatis)</span></div>
       </div>
     <% } %>
 
@@ -71,32 +71,59 @@
   const boxes = document.querySelectorAll('.otp-box');
   const hidden = document.getElementById('kodeFull');
   const btn = document.getElementById('btnVerify');
+
+  function fillBoxes(digits) {
+    digits.split('').forEach(function(ch, i) {
+      if (boxes[i]) { boxes[i].value = ch; boxes[i].classList.add('filled'); }
+    });
+    var last = Math.min(digits.length, boxes.length) - 1;
+    if (last >= 0) boxes[last].focus();
+    update();
+  }
+
   function update() {
-    const val = Array.from(boxes).map(b => b.value).join('');
+    var val = Array.from(boxes).map(function(b) { return b.value; }).join('');
     hidden.value = val;
     btn.disabled = val.length < 6;
   }
-  boxes.forEach((box, i) => {
+
+  boxes.forEach(function(box, i) {
     box.addEventListener('input', function() {
       this.value = this.value.replace(/\D/g,'').slice(-1);
-      if (this.value && i < boxes.length-1) boxes[i+1].focus();
+      if (this.value && i < boxes.length - 1) boxes[i + 1].focus();
       this.classList.toggle('filled', !!this.value);
       update();
     });
     box.addEventListener('keydown', function(e) {
-      if (e.key==='Backspace' && !this.value && i>0) {
-        boxes[i-1].value=''; boxes[i-1].classList.remove('filled'); boxes[i-1].focus(); update();
+      if (e.key === 'Backspace' && !this.value && i > 0) {
+        boxes[i-1].value = ''; boxes[i-1].classList.remove('filled'); boxes[i-1].focus(); update();
       }
     });
+    box.addEventListener('paste', function(e) {
+      e.preventDefault();
+      var text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+      if (text) fillBoxes(text);
+    });
   });
-  let sec=300;
-  const cd=document.getElementById('countdown');
-  const t=setInterval(()=>{
+
+  // Klik kode demo untuk isi otomatis
+  var demoCode = document.getElementById('demoCode');
+  if (demoCode) {
+    demoCode.style.cursor = 'pointer';
+    demoCode.title = 'Klik untuk isi otomatis';
+    demoCode.addEventListener('click', function() {
+      fillBoxes(this.textContent.trim());
+    });
+  }
+
+  let sec = 300;
+  const cd = document.getElementById('countdown');
+  const t = setInterval(function() {
     sec--;
-    if(sec<=0){clearInterval(t);cd.textContent='Kode kedaluwarsa';return;}
-    const m=Math.floor(sec/60),s=sec%60;
-    cd.textContent='Kode berlaku '+m+':'+String(s).padStart(2,'0');
-  },1000);
+    if (sec <= 0) { clearInterval(t); cd.textContent = 'Kode kedaluwarsa'; return; }
+    var m = Math.floor(sec / 60), s = sec % 60;
+    cd.textContent = 'Kode berlaku ' + m + ':' + String(s).padStart(2, '0');
+  }, 1000);
 })();
 </script>
 </body>

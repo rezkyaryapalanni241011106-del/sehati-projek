@@ -20,7 +20,7 @@ export class AuthController {
   // PASIEN — Login OTP
   // ============================================================
 
-  showPasienLogin = (req: Request, res: Response): void => {
+  showPasienLogin = (_req: Request, res: Response): void => {
     res.render('auth/pasien-login', { title: 'Login Pasien', otpSent: false });
   };
 
@@ -88,6 +88,7 @@ export class AuthController {
     if (!pasien) {
       (req.session as any).otp_verified_hp = nomor_hp;
       delete (req.session as any).otp_nomor_hp;
+      req.flash('info', 'Nomor HP belum terdaftar. Lengkapi data berikut untuk membuat akun pasien.');
       res.redirect('/pasien/register');
       return;
     }
