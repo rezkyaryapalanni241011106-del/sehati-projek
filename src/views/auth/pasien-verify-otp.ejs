@@ -94,6 +94,12 @@
       this.classList.toggle('filled', !!this.value);
       update();
     });
+    // Tangkap autofill browser (tidak selalu trigger 'input')
+    box.addEventListener('change', function() {
+      this.value = this.value.replace(/\D/g,'').slice(-1);
+      this.classList.toggle('filled', !!this.value);
+      update();
+    });
     box.addEventListener('keydown', function(e) {
       if (e.key === 'Backspace' && !this.value && i > 0) {
         boxes[i-1].value = ''; boxes[i-1].classList.remove('filled'); boxes[i-1].focus(); update();
@@ -104,6 +110,11 @@
       var text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
       if (text) fillBoxes(text);
     });
+  });
+
+  // Pastikan hidden field selalu sinkron saat form submit
+  document.querySelector('form').addEventListener('submit', function() {
+    update();
   });
 
   // Klik kode demo untuk isi otomatis

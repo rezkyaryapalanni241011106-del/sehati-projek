@@ -74,7 +74,13 @@ export class AuthController {
       return;
     }
 
-    const valid = await verifikasiOTP(nomor_hp, kode?.trim());
+    if (!kode || kode.trim().length !== 6) {
+      req.flash('error', 'Kode OTP harus 6 digit. Pastikan semua kotak terisi.');
+      res.redirect('/auth/pasien/login');
+      return;
+    }
+
+    const valid = await verifikasiOTP(nomor_hp, kode.trim());
 
     if (!valid) {
       await logAudit({ req, aktivitas: 'LOGIN_PASIEN', status: 'gagal', keterangan: `OTP salah untuk ${maskNomorHp(nomor_hp)}` });
