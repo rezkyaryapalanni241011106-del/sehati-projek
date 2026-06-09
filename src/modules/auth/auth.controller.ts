@@ -111,8 +111,10 @@ export class AuthController {
 
   logoutPasien = (req: Request, res: Response): void => {
     res.clearCookie('token_pasien');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
     req.session.destroy(() => {
-      res.redirect('/auth/pasien/login');
+      res.redirect('/');
     });
   };
 
@@ -249,7 +251,7 @@ export class AuthController {
   logoutStaf = (req: Request, res: Response): void => {
     res.clearCookie('token');
     req.session.destroy(() => {
-      res.redirect('/auth/login');
+      res.redirect('/');
     });
   };
 

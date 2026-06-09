@@ -47,9 +47,45 @@
       Akun Admin
     </a>
     <div class="sidebar-section">Pengawasan (read-only)</div>
-    <a href="/jadwal" class="nav-item">Dashboard Admin</a>
-    <a href="/antrian" class="nav-item">Antrian Dokter</a>
-    <a href="/kedatangan" class="nav-item">Front Desk</a>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Dashboard Admin
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/admin" class="nav-item nav-sub-item">Ringkasan</a>
+        <a href="/jadwal" class="nav-item nav-sub-item">Jadwal Praktek</a>
+        <a href="/akun/staf" class="nav-item nav-sub-item">Akun Staf</a>
+        <a href="/spesialisasi" class="nav-item nav-sub-item">Spesialisasi</a>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Dashboard Dokter
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/antrian" class="nav-item nav-sub-item">Antrian Hari Ini</a>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          Front Desk
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/kedatangan" class="nav-item nav-sub-item">Konfirmasi Kedatangan</a>
+      </div>
+    </details>
 
     <div class="sidebar-footer">
       <a href="/auth/logout" class="logout-btn">
@@ -174,8 +210,8 @@
             <% } else { aktivitasTerbaru.forEach(function(a) { %>
               <tr>
                 <td class="tiny"><%= new Date(a.waktu).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit' }) %></td>
-                <td><%= a.username || '—' %></td>
-                <td class="tiny muted"><%= a.peran_user || '—' %></td>
+                <td><%= a.username || '-' %></td>
+                <td class="tiny muted"><%= a.peran_user || '-' %></td>
                 <td><%= a.aktivitas %></td>
                 <td><span class="badge badge-<%= a.status === 'sukses' ? 'ringan' : 'kritis' %>"><%= a.status %></span></td>
               </tr>

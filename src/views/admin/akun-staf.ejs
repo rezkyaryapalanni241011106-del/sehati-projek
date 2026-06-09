@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/public/css/admin.css">
   <link rel="stylesheet" href="/public/css/sehati.css">
 </head>
+<% const isSuperAdmin = user && user.peran === 'super_admin'; %>
 <body>
 <div class="app-shell admin">
   <aside class="sidebar admin">
@@ -17,11 +18,66 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
       </span>
       <div class="brand-text">
-        SEHATI Admin Portal
-        <span class="sub">Akun Staf · Jadwal Praktek</span>
+        <% if (isSuperAdmin) { %>SEHATI Super Admin<% } else { %>SEHATI Admin Portal<% } %>
+        <span class="sub"><% if (isSuperAdmin) { %>Audit · Pengawasan · Akun Admin<% } else { %>Akun Staf · Jadwal Praktek<% } %></span>
       </div>
     </div>
 
+    <% if (isSuperAdmin) { %>
+    <div class="sidebar-section" style="color:var(--admin);">Super Admin</div>
+    <a href="/audit" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+      Overview Sistem
+    </a>
+    <a href="/audit/log" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+      Jejak Audit
+    </a>
+    <a href="/akun/admin" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+      Akun Admin
+    </a>
+    <div class="sidebar-section">Pengawasan (read-only)</div>
+    <details class="nav-group" open>
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Dashboard Admin
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/admin" class="nav-item nav-sub-item">Ringkasan</a>
+        <a href="/jadwal" class="nav-item nav-sub-item">Jadwal Praktek</a>
+        <a href="/akun/staf" class="nav-item nav-sub-item active">Akun Staf</a>
+        <a href="/spesialisasi" class="nav-item nav-sub-item">Spesialisasi</a>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Dashboard Dokter
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/antrian" class="nav-item nav-sub-item">Antrian Hari Ini</a>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          Front Desk
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/kedatangan" class="nav-item nav-sub-item">Konfirmasi Kedatangan</a>
+      </div>
+    </details>
+    <% } else { %>
     <div class="sidebar-section" style="color:var(--admin);">Admin</div>
     <a href="/admin" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -39,6 +95,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
       Spesialisasi
     </a>
+    <% } %>
 
     <div class="sidebar-footer">
       <a href="/auth/logout" class="logout-btn">
@@ -59,7 +116,7 @@
           <span class="avatar" style="background:#f8eaea; color:var(--admin);"><%= user.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase() %></span>
           <div>
             <div class="user-name"><%= user.nama %></div>
-            <div class="user-role">Admin</div>
+            <div class="user-role"><%= isSuperAdmin ? 'Super Admin' : 'Admin' %></div>
           </div>
         </div>
       </div>
@@ -76,6 +133,7 @@
         </div>
       </div>
 
+      <% if (!isSuperAdmin) { %>
       <div class="card card-padded" style="margin-bottom:18px;">
         <h3 style="margin-bottom:14px;"><%= edit ? 'Edit Akun' : 'Tambah Akun Baru' %></h3>
         <form method="POST" action="<%= edit ? '/akun/staf/' + edit.id + '/update' : '/akun/staf' %>" class="form-grid">
@@ -116,13 +174,13 @@
             <div class="combo" id="spsCombo">
               <input type="hidden" name="spesialisasi" id="spsValue" value="<%= edit ? (edit.spesialisasi || '') : '' %>">
               <button type="button" class="form-input combo-trigger" id="spsTrigger" style="text-align:left; display:flex; justify-content:space-between; align-items:center; height:auto;">
-                <span id="spsLabel" style="<%= (edit && edit.spesialisasi) ? '' : 'color:var(--ink-soft);' %>"><%= (edit && edit.spesialisasi_nama) ? edit.spesialisasi_nama : '— Pilih spesialisasi —' %></span>
+                <span id="spsLabel" style="<%= (edit && edit.spesialisasi) ? '' : 'color:var(--ink-soft);' %>"><%= (edit && edit.spesialisasi_nama) ? edit.spesialisasi_nama : 'Pilih spesialisasi' %></span>
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </button>
               <div class="combo-panel" id="spsPanel" hidden>
                 <input type="text" class="combo-search" id="spsSearch" placeholder="Cari spesialisasi…" autocomplete="off">
                 <ul class="combo-list" id="spsList">
-                  <li class="combo-option" data-value="">— Pilih spesialisasi —</li>
+                  <li class="combo-option" data-value="">Pilih spesialisasi</li>
                   <% spesialisasiList.forEach(function(sp) { %>
                     <li class="combo-option" data-value="<%= sp.id %>"><%= sp.nama %></li>
                   <% }); %>
@@ -140,11 +198,12 @@
           </div>
         </form>
       </div>
+      <% } %>
 
       <div class="table-wrap">
         <table class="data-table">
           <thead>
-            <tr><th>Nama</th><th>Username</th><th>Peran</th><th>Email</th><th>Status</th><th>Aksi</th></tr>
+            <tr><th>Nama</th><th>Username</th><th>Peran</th><th>Email</th><th>Status</th><% if (!isSuperAdmin) { %><th>Aksi</th><% } %></tr>
           </thead>
           <tbody>
             <% users.forEach(function(u) { %>
@@ -157,6 +216,7 @@
                 <td><span class="badge badge-menengah"><%= u.peran === 'dokter' ? 'Dokter' : u.peran === 'perawat' ? 'Perawat' : 'Resepsionis' %></span></td>
                 <td class="tiny muted"><%= u.email %></td>
                 <td><span class="badge badge-<%= u.status_aktif ? 'ringan' : 'kritis' %>"><%= u.status_aktif ? 'Aktif' : 'Nonaktif' %></span></td>
+                <% if (!isSuperAdmin) { %>
                 <td class="aksi-cell" style="white-space:nowrap;">
                   <a class="back-link" href="/akun/staf/<%= u.id %>/edit">Edit</a>
                   <form method="POST" action="/akun/staf/<%= u.id %>/toggle" style="display:inline; margin:0;">
@@ -165,6 +225,7 @@
                   <button class="back-link" style="border:none; cursor:pointer; background:none;"
                     onclick="bukaModalReset('<%= u.id %>', '<%= u.nama_lengkap %>')">Reset PW</button>
                 </td>
+                <% } %>
               </tr>
             <% }); %>
           </tbody>
@@ -174,6 +235,7 @@
   </section>
 </div>
 
+<% if (!isSuperAdmin) { %>
 <!-- Modal Reset Password -->
 <div id="modalReset" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:999; align-items:center; justify-content:center;">
   <div style="background:#fff; border-radius:12px; padding:28px 32px; width:100%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,.18);">
@@ -246,5 +308,6 @@ document.getElementById('modalReset').addEventListener('click', function(e) {
   if (e.target === this) tutupModalReset();
 });
 </script>
+<% } %>
 </body>
 </html>

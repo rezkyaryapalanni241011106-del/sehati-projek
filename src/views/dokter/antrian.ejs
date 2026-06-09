@@ -6,6 +6,7 @@
   <title>Antrian Hari Ini · SEHATI</title>
   <link rel="stylesheet" href="/public/css/base.css">
   <link rel="stylesheet" href="/public/css/medis.css">
+  <link rel="stylesheet" href="/public/css/admin.css">
   <link rel="stylesheet" href="/public/css/sehati.css">
   <style>
     .greeting-date {
@@ -65,24 +66,81 @@
     }
   </style>
 </head>
+<% const isSuperAdmin = user && user.peran === 'super_admin'; %>
 <body>
-<div class="app-shell">
-  <aside class="sidebar">
+<div class="app-shell <%= isSuperAdmin ? 'admin' : '' %>">
+  <aside class="sidebar <%= isSuperAdmin ? 'admin' : '' %>">
     <div class="sidebar-brand">
       <span class="logo-mark">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
       </span>
       <div class="brand-text">
-        SEHATI Klinis
-        <span class="sub">Rekam Medis Elektronik · Rawat Jalan</span>
+        <% if (isSuperAdmin) { %>SEHATI Super Admin<% } else { %>SEHATI Klinis<% } %>
+        <span class="sub"><% if (isSuperAdmin) { %>Audit · Pengawasan · Akun Admin<% } else { %>Rekam Medis Elektronik · Rawat Jalan<% } %></span>
       </div>
     </div>
 
+    <% if (isSuperAdmin) { %>
+    <div class="sidebar-section" style="color:var(--admin);">Super Admin</div>
+    <a href="/audit" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+      Overview Sistem
+    </a>
+    <a href="/audit/log" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+      Jejak Audit
+    </a>
+    <a href="/akun/admin" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+      Akun Admin
+    </a>
+    <div class="sidebar-section">Pengawasan (read-only)</div>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Dashboard Admin
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/admin" class="nav-item nav-sub-item">Ringkasan</a>
+        <a href="/jadwal" class="nav-item nav-sub-item">Jadwal Praktek</a>
+        <a href="/akun/staf" class="nav-item nav-sub-item">Akun Staf</a>
+        <a href="/spesialisasi" class="nav-item nav-sub-item">Spesialisasi</a>
+      </div>
+    </details>
+    <details class="nav-group" open>
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Dashboard Dokter
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/antrian" class="nav-item nav-sub-item active">Antrian Hari Ini</a>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          Front Desk
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/kedatangan" class="nav-item nav-sub-item">Konfirmasi Kedatangan</a>
+      </div>
+    </details>
+    <% } else { %>
     <div class="sidebar-section">Konsultasi</div>
     <a href="/antrian" class="nav-item active">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
       Antrian Hari Ini
     </a>
+    <% } %>
 
     <div class="sidebar-footer">
       <a href="/auth/logout" class="logout-btn">
@@ -103,7 +161,7 @@
           <span class="avatar"><%= user.nama.split(' ').map(function(w){return w[0]}).join('').substring(0,2).toUpperCase() %></span>
           <div>
             <div class="user-name"><%= user.nama %></div>
-            <div class="user-role">Dokter<% if (locals.spesialisasi_nama) { %> · <%= spesialisasi_nama %><% } %></div>
+            <div class="user-role"><% if (isSuperAdmin) { %>Super Admin<% } else { %>Dokter<% if (locals.spesialisasi_nama) { %> · <%= spesialisasi_nama %><% } %><% } %></div>
           </div>
         </div>
       </div>
@@ -164,7 +222,7 @@
               <th>Pasien</th>
               <th style="width:100px;">Hadir</th>
               <th>Keluhan Awal</th>
-              <th style="width:130px;">Aksi</th>
+              <% if (!isSuperAdmin) { %><th style="width:130px;">Aksi</th><% } %>
             </tr>
           </thead>
           <tbody id="antrianBody">
@@ -178,11 +236,16 @@
                 </div>
               </td>
               <td style="font-family:var(--font-mono); font-size:13px; color:var(--ink-soft);">
-                <%= k.waktu_konfirmasi ? new Date(k.waktu_konfirmasi).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '—' %>
+                <%= k.waktu_konfirmasi ? new Date(k.waktu_konfirmasi).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
               </td>
               <td style="font-size:13px; color:var(--ink-soft); max-width:280px;">
-                <%= k.keluhan_awal ? k.keluhan_awal.substring(0,60) + (k.keluhan_awal.length > 60 ? '…' : '') : '<em style="color:var(--ink-muted);">Tidak ada keluhan</em>' %>
+                <% if (k.keluhan_awal) { %>
+                  <%= k.keluhan_awal.substring(0, 60) %><%= k.keluhan_awal.length > 60 ? '…' : '' %>
+                <% } else { %>
+                  <em style="color:var(--ink-muted);">Tidak ada keluhan</em>
+                <% } %>
               </td>
+              <% if (!isSuperAdmin) { %>
               <td class="aksi-cell" style="display:flex; gap:6px; align-items:center; padding-top:12px; padding-bottom:12px;">
                 <a href="/soap/<%= k.id %>" class="btn btn-primary btn-sm">
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
@@ -190,6 +253,7 @@
                 </a>
                 <button class="btn btn-ghost btn-sm btn-skip" data-id="<%= k.id %>">Skip</button>
               </td>
+              <% } %>
             </tr>
             <% }); %>
           </tbody>
@@ -200,7 +264,7 @@
       <% if (standby.length > 0) { %>
       <div class="section-wrap">
         <div class="section-head">
-          <h3>Standby — Dilewati</h3>
+          <h3>Standby · Dilewati</h3>
           <span class="tiny muted"><%= standby.length %> pasien</span>
         </div>
         <table class="data-table">
@@ -220,9 +284,11 @@
                   <div class="id"><%= k.nomor_rm %> · <%= k.usia %> thn</div>
                 </div>
               </td>
-              <td style="font-size:13px; color:var(--ink-soft);"><%= k.alasan_skip || '—' %></td>
+              <td style="font-size:13px; color:var(--ink-soft);"><%= k.alasan_skip || 'Tidak ada catatan' %></td>
               <td class="aksi-cell">
+                <% if (!isSuperAdmin) { %>
                 <button class="btn btn-ghost btn-sm btn-standby-back" data-id="<%= k.id %>">↩ Kembalikan</button>
+                <% } %>
               </td>
             </tr>
             <% }); %>
@@ -234,6 +300,7 @@
   </section>
 </div>
 
+<% if (!isSuperAdmin) { %>
 <!-- Modal Skip -->
 <div id="skipModal" class="modal-overlay">
   <div class="modal-box">
@@ -282,6 +349,7 @@
     }
   });
 
+  <% if (!isSuperAdmin) { %>
   document.querySelectorAll('.btn-standby-back').forEach(function(btn) {
     btn.addEventListener('click', async function() {
       const r = await fetch('/antrian/' + this.dataset.id + '/standby-back', { method: 'POST' });
@@ -289,6 +357,7 @@
       if (data.ok) window.location.reload();
     });
   });
+  <% } %>
 
   // Countdown polling label
   var countdown = 30;
@@ -302,5 +371,6 @@
   }
 })();
 </script>
+<% } %>
 </body>
 </html>

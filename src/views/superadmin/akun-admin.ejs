@@ -36,9 +36,45 @@
       Akun Admin
     </a>
     <div class="sidebar-section">Pengawasan (read-only)</div>
-    <a href="/jadwal" class="nav-item">Dashboard Admin</a>
-    <a href="/antrian" class="nav-item">Antrian Dokter</a>
-    <a href="/kedatangan" class="nav-item">Front Desk</a>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Dashboard Admin
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/admin" class="nav-item nav-sub-item">Ringkasan</a>
+        <a href="/jadwal" class="nav-item nav-sub-item">Jadwal Praktek</a>
+        <a href="/akun/staf" class="nav-item nav-sub-item">Akun Staf</a>
+        <a href="/spesialisasi" class="nav-item nav-sub-item">Spesialisasi</a>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Dashboard Dokter
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/antrian" class="nav-item nav-sub-item">Antrian Hari Ini</a>
+      </div>
+    </details>
+    <details class="nav-group">
+      <summary>
+        <span class="nav-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          Front Desk
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </summary>
+      <div class="nav-sub">
+        <a href="/kedatangan" class="nav-item nav-sub-item">Konfirmasi Kedatangan</a>
+      </div>
+    </details>
 
     <div class="sidebar-footer">
       <a href="/auth/logout" class="logout-btn">
@@ -125,9 +161,8 @@
                   <form method="POST" action="/akun/admin/<%= u.id %>/toggle" style="display:inline; margin:0;">
                     <button class="back-link" style="border:none; cursor:pointer;"><%= u.status_aktif ? 'Nonaktifkan' : 'Aktifkan' %></button>
                   </form>
-                  <form method="POST" action="/akun/admin/<%= u.id %>/reset-password" style="display:inline; margin:0;" onsubmit="return confirm('Reset password admin ini?');">
-                    <button class="back-link" style="border:none; cursor:pointer;">Reset PW</button>
-                  </form>
+                  <button class="back-link" style="border:none; cursor:pointer; background:none;"
+                    onclick="bukaModalReset('<%= u.id %>', '<%= u.nama_lengkap %>')">Reset PW</button>
                 </td>
               </tr>
             <% }); %>
@@ -137,5 +172,42 @@
     </div>
   </section>
 </div>
+
+<!-- Modal Reset Password -->
+<div id="modalReset" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:999; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:12px; padding:28px 32px; width:100%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,.18);">
+    <h3 style="margin:0 0 4px;">Reset Password</h3>
+    <p id="modalResetNama" style="margin:0 0 20px; color:var(--ink-soft); font-size:14px;"></p>
+    <form id="formModalReset" method="POST" action="">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Password baru</label>
+        <input class="form-input" type="text" name="password_custom" id="modalResetInput"
+          placeholder="kosong = auto-generate" autocomplete="new-password">
+        <div style="font-size:12px; color:var(--ink-soft); margin-top:6px;">Kosongkan untuk generate password acak otomatis.</div>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button type="button" class="btn" style="background:var(--bg-soft);" onclick="tutupModalReset()">Batal</button>
+        <button type="submit" class="btn btn-primary">Reset Password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function bukaModalReset(id, nama) {
+  document.getElementById('formModalReset').action = '/akun/admin/' + id + '/reset-password';
+  document.getElementById('modalResetNama').textContent = 'Akun: ' + nama;
+  document.getElementById('modalResetInput').value = '';
+  var modal = document.getElementById('modalReset');
+  modal.style.display = 'flex';
+  document.getElementById('modalResetInput').focus();
+}
+function tutupModalReset() {
+  document.getElementById('modalReset').style.display = 'none';
+}
+document.getElementById('modalReset').addEventListener('click', function(e) {
+  if (e.target === this) tutupModalReset();
+});
+</script>
 </body>
 </html>

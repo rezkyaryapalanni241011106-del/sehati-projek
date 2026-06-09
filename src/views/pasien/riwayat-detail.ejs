@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/public/css/base.css">
   <link rel="stylesheet" href="/public/css/patient.css">
   <link rel="stylesheet" href="/public/css/sehati.css">
+  <script>window.addEventListener('pageshow',function(e){if(e.persisted){document.documentElement.style.visibility='hidden';window.location.replace(window.location.href);}});</script>
 </head>
 <body>
 <header class="topbar">
@@ -55,7 +56,7 @@
       <div class="card card-padded" style="margin-bottom:16px;">
         <div style="margin-bottom:14px;">
           <div class="form-label" style="margin-bottom:6px;">Subjective (keluhan)</div>
-          <div class="muted"><%= soap.subjektif || kunjungan.keluhan_awal || '—' %></div>
+          <div class="muted"><%= soap.subjektif || kunjungan.keluhan_awal || 'Belum diisi' %></div>
         </div>
         <hr style="border:none; border-top:1px solid var(--border);">
         <div style="margin:14px 0;">
@@ -70,21 +71,21 @@
           <div class="form-label" style="margin-bottom:6px;">Assessment (diagnosis)</div>
           <div class="muted">
             <% if (soap.kode_dx) { %>
-              <%= soap.kode_dx %> — <%= soap.dx_label || '' %>
+              <%= soap.kode_dx %> · <%= soap.dx_label || '' %>
             <% } else { %>
-              —
+              Belum terisi
             <% } %>
           </div>
         </div>
         <hr style="border:none; border-top:1px solid var(--border);">
         <div style="margin-top:14px;">
-          <div class="form-label" style="margin-bottom:6px;">Plan — Tindakan</div>
-          <div class="muted" style="white-space:pre-line;"><%= soap.tindakan || '—' %></div>
+          <div class="form-label" style="margin-bottom:6px;">Plan · Tindakan</div>
+          <div class="muted" style="white-space:pre-line;"><%= soap.tindakan || 'Tidak ada' %></div>
         </div>
         <% if (soap.anjuran) { %>
         <hr style="border:none; border-top:1px solid var(--border);">
         <div style="margin-top:14px;">
-          <div class="form-label" style="margin-bottom:6px;">Plan — Anjuran / Edukasi</div>
+          <div class="form-label" style="margin-bottom:6px;">Plan · Anjuran / Edukasi</div>
           <div class="muted" style="white-space:pre-line;"><%= soap.anjuran %></div>
         </div>
         <% } %>
@@ -120,5 +121,6 @@
   </div>
 </main>
 <footer class="app-footer">SEHATI · Rekam Medis Elektronik Rawat Jalan</footer>
+<script src="/public/js/auth-guard.js"></script>
 </body>
 </html>

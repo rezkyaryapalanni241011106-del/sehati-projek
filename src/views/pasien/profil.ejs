@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/public/css/base.css">
   <link rel="stylesheet" href="/public/css/patient.css">
   <link rel="stylesheet" href="/public/css/sehati.css">
+  <script>window.addEventListener('pageshow',function(e){if(e.persisted){document.documentElement.style.visibility='hidden';window.location.replace(window.location.href);}});</script>
 </head>
 <body>
 <header class="topbar">
@@ -79,15 +80,15 @@
       <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px 20px;">
         <div>
           <div class="form-label">Golongan Darah</div>
-          <div><%= pasien.golongan_darah || '—' %></div>
+          <div><%= pasien.golongan_darah || 'Belum diisi' %></div>
         </div>
         <div>
           <div class="form-label">Alergi</div>
-          <div><%= pasien.alergi || '—' %></div>
+          <div><%= pasien.alergi || 'Tidak ada' %></div>
         </div>
         <div>
           <div class="form-label">Riwayat Penyakit Kronis</div>
-          <div><%= pasien.riwayat_kronis || '—' %></div>
+          <div><%= pasien.riwayat_kronis || 'Tidak ada' %></div>
         </div>
       </div>
     </div>
@@ -114,5 +115,6 @@
   </div>
 </main>
 <footer class="app-footer">SEHATI · Rekam Medis Elektronik Rawat Jalan</footer>
+<script src="/public/js/auth-guard.js"></script>
 </body>
 </html>

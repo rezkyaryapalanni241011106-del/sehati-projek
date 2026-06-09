@@ -3,6 +3,12 @@ import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
 import { JwtPayload, Peran } from '../types';
 
+function setNoCache(res: Response): void {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+}
+
 export function verifyJWT(req: Request, res: Response, next: NextFunction): void {
   const token = req.cookies?.token;
   if (!token) {
@@ -13,6 +19,7 @@ export function verifyJWT(req: Request, res: Response, next: NextFunction): void
   try {
     const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
     req.user = payload;
+    setNoCache(res);
     next();
   } catch {
     res.clearCookie('token');
@@ -35,6 +42,7 @@ export function verifyJWTPasien(req: Request, res: Response, next: NextFunction)
       return;
     }
     req.user = payload;
+    setNoCache(res);
     next();
   } catch {
     res.clearCookie('token_pasien');

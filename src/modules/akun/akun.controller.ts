@@ -178,7 +178,8 @@ export class AkunController {
 
   resetPasswordAdmin = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id;
-    const pass = randPass('admin');
+    const { password_custom } = req.body;
+    const pass = password_custom?.trim() || randPass('admin');
     const hash = await hashPass(pass);
 
     await this.model.setPassword(id, hash);

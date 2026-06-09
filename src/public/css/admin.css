@@ -15,3 +15,38 @@
 }
 
 .sidebar.admin .sidebar-section { color: var(--ink-muted); }
+
+/* Accordion monitoring nav groups */
+.nav-group { border: none; background: none; }
+.nav-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  font-weight: 500;
+  font-size: 13.5px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background .12s, color .12s;
+}
+.nav-group > summary::-webkit-details-marker { display: none; }
+.nav-group > summary::marker { display: none; }
+.nav-group > summary:hover { background: var(--bg-soft); color: var(--ink); }
+.nav-group[open] > summary { color: var(--ink); font-weight: 600; }
+.nav-group-label { display: flex; align-items: center; gap: 10px; }
+.nav-group-label svg { width: 16px; height: 16px; }
+.nav-group .chevron { width: 13px; height: 13px; flex-shrink: 0; transition: transform .2s; }
+.nav-group[open] .chevron { transform: rotate(90deg); }
+.nav-sub { display: flex; flex-direction: column; padding-bottom: 2px; }
+.nav-sub-item { padding: 6px 10px 6px 26px; font-size: 13px; }
+.nav-sub-item.active,
+.sidebar.admin .nav-sub-item.active {
+  background: transparent;
+  border-left: 2px solid var(--admin);
+  padding-left: 24px;
+  color: var(--admin);
+  font-weight: 600;
+}

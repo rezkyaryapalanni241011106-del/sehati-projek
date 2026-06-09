@@ -38,6 +38,9 @@
     /* Resep table: scrollable on small screens */
     .resep-scroll { overflow-x: auto; }
     .resep-table th, .resep-table td { white-space: nowrap; }
+    .resep-table td input, .resep-table td select { min-width: 0; width: 100%; box-sizing: border-box; }
+    .resep-table input[type=number]::-webkit-inner-spin-button,
+    .resep-table input[type=number]::-webkit-outer-spin-button { opacity: 1; width: 16px; }
 
     /* Lock banner */
     .lock-banner {
@@ -170,7 +173,7 @@
         <div class="lock-banner">
           <span style="font-size:13.5px; color:var(--ringan);">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            Catatan SOAP terkunci — mode baca saja.
+            Catatan SOAP terkunci, mode baca saja.
           </span>
         </div>
       <% } %>
@@ -180,18 +183,18 @@
       <form method="POST" action="/soap/<%= kunjungan.id %>/simpan" class="soap-form">
         <div class="soap-grid">
 
-          <!-- S — Subjective -->
+          <!-- S · Subjective -->
           <div class="card soap-section span-full">
-            <div class="soap-tag">S — Subjective</div>
+            <div class="soap-tag">S · Subjective</div>
             <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Keluhan utama (dari pasien, dapat dilengkapi)</label>
               <textarea class="form-textarea" name="subjektif" <%= locked ? 'readonly' : '' %> style="min-height:80px;"><%= soap ? soap.subjektif : (kunjungan.keluhan_awal || '') %></textarea>
             </div>
           </div>
 
-          <!-- O — Objective -->
+          <!-- O · Objective -->
           <div class="card soap-section">
-            <div class="soap-tag">O — Objective (tanda vital)</div>
+            <div class="soap-tag">O · Objective (tanda vital)</div>
             <div class="vital-grid">
               <div class="form-group">
                 <label class="form-label">TD Sistolik</label>
@@ -232,15 +235,15 @@
             </div>
           </div>
 
-          <!-- A — Assessment -->
+          <!-- A · Assessment -->
           <div class="card soap-section">
-            <div class="soap-tag">A — Assessment (diagnosis ICD-10)</div>
+            <div class="soap-tag">A · Assessment (diagnosis ICD-10)</div>
             <div class="form-group">
               <label class="form-label">Diagnosis utama *</label>
               <input type="hidden" name="kode_dx" id="kode_dx" value="<%= soap ? (soap.kode_dx || '') : '' %>">
               <div class="icd-wrapper">
                 <input class="form-input" id="icd-search" autocomplete="off"
-                       value="<%= soap && soap.kode_dx ? soap.kode_dx + ' — ' + (soap.dx_desc || '') : '' %>"
+                       value="<%= soap && soap.kode_dx ? soap.kode_dx + ' · ' + (soap.dx_desc || '') : '' %>"
                        placeholder="Ketik kode atau nama penyakit, mis. 'ISPA' atau 'J06'…"
                        <%= locked ? 'readonly' : '' %>>
                 <div id="icd-results" class="icd-results"></div>
@@ -255,9 +258,9 @@
             </div>
           </div>
 
-          <!-- P — Plan -->
+          <!-- P · Plan -->
           <div class="card soap-section span-full">
-            <div class="soap-tag">P — Plan</div>
+            <div class="soap-tag">P · Plan</div>
             <div class="form-grid" style="margin-bottom:12px;">
               <div class="form-group">
                 <label class="form-label">Tindakan medis</label>
@@ -280,10 +283,10 @@
                     <% } else { resepList.forEach(function(r) { %>
                       <tr>
                         <td><%= r.nama_obat %></td>
-                        <td><%= r.dosis || '—' %></td>
-                        <td><%= r.frekuensi || '—' %></td>
-                        <td><%= r.durasi || '—' %></td>
-                        <td><%= r.jumlah || '—' %></td>
+                        <td><%= r.dosis || '-' %></td>
+                        <td><%= r.frekuensi || '-' %></td>
+                        <td><%= r.durasi || '-' %></td>
+                        <td><%= r.jumlah || '-' %></td>
                         <td><%= r.cara_pakai ? r.cara_pakai.charAt(0).toUpperCase() + r.cara_pakai.slice(1) : '' %></td>
                       </tr>
                     <% }); } %>
@@ -302,7 +305,7 @@
                       <th style="width:110px;">Dosis</th>
                       <th style="width:130px;">Frekuensi</th>
                       <th style="width:100px;">Durasi</th>
-                      <th style="width:72px;">Jml</th>
+                      <th style="width:90px;">Jml</th>
                       <th style="width:120px;">Cara</th>
                       <th style="width:44px;"></th>
                     </tr>
@@ -384,10 +387,10 @@
             data.forEach(function(item) {
               var li = document.createElement('div');
               li.className = 'icd-item';
-              li.innerHTML = '<strong>' + item.kode + '</strong> — ' + item.deskripsi;
+              li.innerHTML = '<strong>' + item.kode + '</strong> · ' + item.deskripsi;
               li.addEventListener('click', function() {
                 kodeInput.value = item.kode;
-                icdInput.value  = item.kode + ' — ' + item.deskripsi;
+                icdInput.value  = item.kode + ' · ' + item.deskripsi;
                 results.innerHTML = '';
                 results.style.display = 'none';
               });

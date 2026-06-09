@@ -82,9 +82,9 @@
           </div>
           <% if (k.soap_id) { %>
             <div class="tiny muted" style="line-height:1.8;">
-              <b>Dx:</b> <%= k.kode_dx ? k.kode_dx + ' — ' + (k.dx_label || '') : '—' %><br>
+              <b>Dx:</b> <%= k.kode_dx ? k.kode_dx + ' · ' + (k.dx_label || '') : 'Belum terisi' %><br>
               <b>Vital:</b> TD <%= k.td_sistolik || '–' %>/<%= k.td_diastolik || '–' %> · Nadi <%= k.nadi || '–' %> · Suhu <%= k.suhu || '–' %>°C<br>
-              <b>Plan:</b> <%= k.tindakan || '—' %>
+              <b>Plan:</b> <%= k.tindakan || 'Tidak ada' %>
             </div>
           <% } else { %>
             <div class="tiny muted">Tidak ada catatan SOAP.</div>

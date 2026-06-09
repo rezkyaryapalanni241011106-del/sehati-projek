@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/public/css/base.css">
   <link rel="stylesheet" href="/public/css/patient.css">
   <link rel="stylesheet" href="/public/css/sehati.css">
+  <script>window.addEventListener('pageshow',function(e){if(e.persisted){document.documentElement.style.visibility='hidden';window.location.replace(window.location.href);}});</script>
 </head>
 <body>
 <header class="topbar">
@@ -39,7 +40,7 @@
     <div class="eyebrow">Pra-Konsultasi</div>
     <h1 style="font-size:28px; margin-bottom:6px;">Input Keluhan</h1>
     <p class="muted" style="margin-bottom:20px;">
-      <strong><%= kunjungan.nama_dokter %></strong> —
+      <strong><%= kunjungan.nama_dokter %></strong> ·
       <%= new Date(kunjungan.tanggal).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}) %>
       jam <%= kunjungan.slot_jam.substring(0,5) %>
     </p>
@@ -100,5 +101,6 @@
   update();
 })();
 </script>
+<script src="/public/js/auth-guard.js"></script>
 </body>
 </html>

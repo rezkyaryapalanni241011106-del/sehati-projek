@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/public/css/base.css">
   <link rel="stylesheet" href="/public/css/patient.css">
   <link rel="stylesheet" href="/public/css/sehati.css">
+  <script>window.addEventListener('pageshow',function(e){if(e.persisted){document.documentElement.style.visibility='hidden';window.location.replace(window.location.href);}});</script>
 </head>
 <body>
 <header class="topbar">
@@ -56,7 +57,7 @@
         <div class="form-group">
           <label class="form-label">Spesialisasi</label>
           <select id="spesialisasi" class="form-input">
-            <option value="">— Semua Spesialisasi —</option>
+            <option value="">Semua Spesialisasi</option>
             <% spesialisasiList.forEach(function(s) { %>
               <option value="<%= s.id %>"><%= s.nama %></option>
             <% }); %>
@@ -66,7 +67,7 @@
         <div class="form-group" id="dokterGroup" style="display:none">
           <label class="form-label">Dokter *</label>
           <select id="id_dokter" name="id_dokter" class="form-input" required>
-            <option value="">— Pilih Dokter —</option>
+            <option value="">Pilih Dokter</option>
           </select>
         </div>
 
@@ -104,8 +105,8 @@
     if (!t) return;
     const r = await fetch('/booking/dokter?tanggal=' + t + '&spesialisasi=' + sp);
     const data = await r.json();
-    dokterSelect.innerHTML = '<option value="">— Pilih Dokter —</option>' +
-      data.dokters.map(d => '<option value="' + d.id + '">' + d.nama_lengkap + (d.spesialisasi_nama ? ' — ' + d.spesialisasi_nama : '') + '</option>').join('');
+    dokterSelect.innerHTML = '<option value="">Pilih Dokter</option>' +
+      data.dokters.map(d => '<option value="' + d.id + '">' + d.nama_lengkap + (d.spesialisasi_nama ? ' · ' + d.spesialisasi_nama : '') + '</option>').join('');
     dokterGroup.style.display = data.dokters.length ? 'block' : 'none';
     slotGroup.style.display = 'none';
     btnSubmit.disabled = true;
@@ -140,5 +141,6 @@
   dokterSelect.addEventListener('change', loadSlots);
 })();
 </script>
+<script src="/public/js/auth-guard.js"></script>
 </body>
 </html>

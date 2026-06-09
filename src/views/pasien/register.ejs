@@ -50,7 +50,7 @@
             <div class="form-group">
               <label class="form-label">Jenis Kelamin *</label>
               <select name="jenis_kelamin" class="form-input" required>
-                <option value="">— Pilih —</option>
+                <option value="">Pilih</option>
                 <option value="L">Laki-laki</option>
                 <option value="P">Perempuan</option>
               </select>
@@ -113,7 +113,7 @@
           <div class="form-group">
             <label class="form-label">Golongan Darah</label>
             <select name="golongan_darah" class="form-input">
-              <option value="">— Tidak Tahu —</option>
+              <option value="">Tidak Tahu</option>
               <% ['A','B','AB','O','A+','A-','B+','B-','AB+','AB-','O+','O-'].forEach(function(g) { %>
                 <option value="<%= g %>"><%= g %></option>
               <% }); %>
