@@ -107,6 +107,88 @@ export class BookingController {
     }
   };
 
+  showReschedule = async (req: Request, res: Response): Promise<void> => {
+    const kunjunganId = req.params.id;
+    const pasienId = req.user!.sub;
+
+    const kunjungan = await this.model.findKunjunganDetail(kunjunganId, pasienId);
+    if (!kunjungan || kunjungan.status !== 'booked') {
+      req.flash('error', 'Kunjungan tidak ditemukan atau tidak bisa dijadwalkan ulang.');
+      res.redirect('/pasien/dashboard');
+      return;
+    }
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    const tanggalKunjungan = new Date(kunjungan.tanggal).toISOString().split('T')[0];
+
+    if (tanggalKunjungan < tomorrowStr) {
+      req.flash('error', 'Penjadwalan ulang hanya bisa dilakukan maksimal H-1 sebelum jadwal.');
+      res.redirect('/pasien/dashboard');
+      return;
+    }
+
+    const spesialisasiList = await this.model.findSpesialisasiAktif();
+    res.render('pasien/reschedule', { title: 'Jadwalkan Ulang', kunjungan, spesialisasiList });
+  };
+
+  doReschedule = async (req: Request, res: Response): Promise<void> => {
+    const kunjunganId = req.params.id;
+    const pasienId = req.user!.sub;
+    const { id_dokter, id_jadwal, tanggal, slot_jam } = req.body;
+
+    if (!id_dokter || !id_jadwal || !tanggal || !slot_jam) {
+      req.flash('error', 'Data jadwal baru tidak lengkap.');
+      res.redirect(`/booking/${kunjunganId}/reschedule`);
+      return;
+    }
+
+    const kunjungan = await this.model.findKunjunganDetail(kunjunganId, pasienId);
+    if (!kunjungan || kunjungan.status !== 'booked') {
+      req.flash('error', 'Kunjungan tidak ditemukan.');
+      res.redirect('/pasien/dashboard');
+      return;
+    }
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    const tanggalKunjungan = new Date(kunjungan.tanggal).toISOString().split('T')[0];
+
+    if (tanggalKunjungan < tomorrowStr) {
+      req.flash('error', 'Penjadwalan ulang hanya bisa dilakukan maksimal H-1.');
+      res.redirect('/pasien/dashboard');
+      return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    if (tanggal < today) {
+      req.flash('error', 'Tidak bisa reschedule ke tanggal yang sudah lewat.');
+      res.redirect(`/booking/${kunjunganId}/reschedule`);
+      return;
+    }
+
+    try {
+      await this.model.reschedule(kunjunganId, id_jadwal, tanggal, slot_jam);
+      await logAudit({
+        req, user: req.user,
+        aktivitas: 'RESCHEDULE_BOOKING',
+        tabel_target: 'Kunjungan', id_target: kunjunganId,
+        status: 'sukses',
+      });
+      req.flash('success', 'Booking berhasil dijadwalkan ulang.');
+      res.redirect('/pasien/dashboard');
+    } catch (err: any) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        req.flash('error', 'Slot waktu tersebut sudah tidak tersedia. Pilih slot lain.');
+      } else {
+        req.flash('error', 'Gagal menjadwalkan ulang. Coba lagi.');
+      }
+      res.redirect(`/booking/${kunjunganId}/reschedule`);
+    }
+  };
+
   batalBooking = async (req: Request, res: Response): Promise<void> => {
     const kunjunganId = req.params.id;
     const pasienId = req.user!.sub;

@@ -123,4 +123,24 @@ export class SoapModel {
       [kunjunganId]
     );
   }
+
+  async findKoreksiByKunjungan(kunjunganId: string): Promise<any[]> {
+    const [rows] = await pool.execute<any[]>(
+      `SELECT ks.catatan, ks.created_at, u.nama_lengkap AS nama_dokter
+       FROM Koreksi_SOAP ks
+       JOIN Catatan_SOAP cs ON cs.id = ks.id_soap
+       JOIN Users u ON u.id = ks.id_dokter
+       WHERE cs.id_kunjungan = ?
+       ORDER BY ks.created_at ASC`,
+      [kunjunganId]
+    );
+    return rows;
+  }
+
+  async simpanKoreksi(soapId: string, dokterId: string, catatan: string): Promise<void> {
+    await pool.execute(
+      `INSERT INTO Koreksi_SOAP (id_soap, id_dokter, catatan) VALUES (?, ?, ?)`,
+      [soapId, dokterId, catatan]
+    );
+  }
 }

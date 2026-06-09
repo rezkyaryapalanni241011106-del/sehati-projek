@@ -183,6 +183,7 @@
             <% const statusLabel = {booked:'Terjadwal', hadir:'Hadir'}; %>
             <span class="badge badge-menengah"><%= statusLabel[k.status] || k.status %></span>
             <% if (k.status === 'booked') { %>
+              <a href="/booking/<%= k.id %>/reschedule" class="btn btn-ghost btn-sm">Jadwalkan Ulang</a>
               <a href="/keluhan/<%= k.id %>" class="btn btn-ghost btn-sm">Keluhan</a>
               <form method="POST" action="/booking/<%= k.id %>/batal" style="display:inline;"
                     onsubmit="return confirm('Yakin ingin membatalkan janji ini?')">

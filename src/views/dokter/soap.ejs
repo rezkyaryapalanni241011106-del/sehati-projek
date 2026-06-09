@@ -108,6 +108,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
       Antrian Hari Ini
     </a>
+    <a href="/auth/ubah-password" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      Ubah Password
+    </a>
 
     <div class="sidebar-footer">
       <a href="/auth/logout" class="logout-btn">
@@ -347,6 +351,40 @@
           </div>
         <% } %>
       </form>
+
+      <% if (locked) { %>
+      <div class="card card-padded" style="margin-top:20px; border-left:3px solid var(--accent-soft, #ccc);">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+          <h3 style="margin:0; font-size:15px;">Catatan Koreksi / Addendum</h3>
+          <span style="font-size:11px; background:var(--bg-soft); border:1px solid var(--border); border-radius:4px; padding:2px 8px; color:var(--ink-muted);">Append-only · Tidak dapat diedit</span>
+        </div>
+
+        <% if (koreksiList && koreksiList.length > 0) { %>
+          <% koreksiList.forEach(function(k) { %>
+          <div style="padding:10px 0; border-bottom:1px solid var(--border-soft);">
+            <div style="font-size:12px; color:var(--ink-muted); margin-bottom:3px;">
+              dr. <%= k.nama_dokter %> &nbsp;·&nbsp; <%= new Date(k.created_at).toLocaleString('id-ID', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) %>
+            </div>
+            <div style="font-size:14px; line-height:1.5;"><%= k.catatan %></div>
+          </div>
+          <% }); %>
+        <% } else { %>
+          <p style="color:var(--ink-muted); font-size:13px; margin:0 0 12px;">Belum ada catatan koreksi.</p>
+        <% } %>
+
+        <form method="POST" action="/soap/<%= kunjungan.id %>/koreksi" style="margin-top:16px;">
+          <div class="form-group" style="margin-bottom:12px;">
+            <label class="form-label">Tambah Catatan Koreksi</label>
+            <textarea name="catatan" class="form-textarea" rows="3" minlength="10" required
+              placeholder="Tuliskan koreksi atau addendum (minimal 10 karakter)..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="font-size:14px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Simpan Koreksi
+          </button>
+        </form>
+      </div>
+      <% } %>
     </div>
   </section>
 </div>

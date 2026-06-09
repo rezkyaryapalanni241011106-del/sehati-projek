@@ -22,6 +22,10 @@ router.post('/verify-totp', loginLimiter, ctrl.verifyTOTP);
 router.get('/logout', ctrl.logoutStaf);
 router.post('/logout', ctrl.logoutStaf);
 
+// ---- Ubah Password (staf yang sudah login) ----
+router.get('/ubah-password', verifyJWT, ctrl.showUbahPassword);
+router.post('/ubah-password', verifyJWT, ctrl.prosesUbahPassword);
+
 // ---- MFA Setup (staf yang sudah login) ----
 router.get('/setup-mfa', verifyJWT, ctrl.showSetupMFA);
 router.post('/setup-mfa/verify', verifyJWT, ctrl.verifySetupMFA);

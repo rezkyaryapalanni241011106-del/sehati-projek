@@ -74,6 +74,14 @@ export class JadwalModel {
     return rows.length > 0;
   }
 
+  async batalkanBookingByJadwal(jadwalId: string): Promise<void> {
+    await pool.execute(
+      `UPDATE Kunjungan SET status = 'batal', updated_at = NOW()
+       WHERE id_jadwal = ? AND tanggal >= CURDATE() AND status = 'booked'`,
+      [jadwalId]
+    );
+  }
+
   async delete(id: string): Promise<void> {
     await pool.execute('DELETE FROM Jadwal_Praktek WHERE id = ?', [id]);
   }

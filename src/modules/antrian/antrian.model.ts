@@ -81,6 +81,20 @@ export class AntrianModel {
     return rows;
   }
 
+  async findSelesaiHariIni(dokterId: string, tanggal: string): Promise<any[]> {
+    const [rows] = await pool.execute<any[]>(
+      `SELECT k.id, k.slot_jam, k.updated_at,
+              p.nama_lengkap AS nama_pasien, p.nomor_rm,
+              TIMESTAMPDIFF(YEAR, p.tanggal_lahir, CURDATE()) AS usia
+       FROM Kunjungan k
+       JOIN Pasien p ON k.id_pasien = p.id
+       WHERE k.id_dokter = ? AND k.tanggal = ? AND k.status = 'selesai'
+       ORDER BY k.updated_at DESC`,
+      [dokterId, tanggal]
+    );
+    return rows;
+  }
+
   async getTanggalHariIni(): Promise<string> {
     const [[row]] = await pool.execute<any[]>(
       'SELECT DATE_FORMAT(CURDATE(), "%Y-%m-%d") AS tanggal'

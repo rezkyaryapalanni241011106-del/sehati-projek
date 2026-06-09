@@ -33,5 +33,6 @@ const ctrl = new SoapController();
 router.use(verifyJWT, idleTimeoutStaf, checkRole('dokter'));
 router.get('/:kunjunganId', ctrl.showSoap);
 router.post('/:kunjunganId/simpan', upload.single('file_penunjang'), ctrl.simpanSoap);
+router.post('/:kunjunganId/koreksi', ctrl.simpanKoreksi);
 
 export default router;

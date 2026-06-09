@@ -140,6 +140,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
       Antrian Hari Ini
     </a>
+    <a href="/auth/ubah-password" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      Ubah Password
+    </a>
     <% } %>
 
     <div class="sidebar-footer">
@@ -289,6 +293,44 @@
                 <% if (!isSuperAdmin) { %>
                 <button class="btn btn-ghost btn-sm btn-standby-back" data-id="<%= k.id %>">↩ Kembalikan</button>
                 <% } %>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+
+      <% if (!isSuperAdmin && selesaiHariIni.length > 0) { %>
+      <div class="section-wrap">
+        <div class="section-head">
+          <h3>Pasien Selesai Hari Ini</h3>
+          <span class="tiny muted"><%= selesaiHariIni.length %> konsultasi</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Pasien</th>
+              <th style="width:120px;">Selesai</th>
+              <th style="width:130px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% selesaiHariIni.forEach(function(k, i) { %>
+            <tr>
+              <td style="color:var(--ink-muted); font-size:13px;"><%= i + 1 %></td>
+              <td>
+                <div class="pasien-info">
+                  <div class="nama"><%= k.nama_pasien %></div>
+                  <div class="id"><%= k.nomor_rm %> · <%= k.usia %> thn</div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono); font-size:13px; color:var(--ink-soft);">
+                <%= k.updated_at ? new Date(k.updated_at).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-' %>
+              </td>
+              <td class="aksi-cell">
+                <a href="/soap/<%= k.id %>" class="btn btn-ghost btn-sm">Lihat SOAP</a>
               </td>
             </tr>
             <% }); %>

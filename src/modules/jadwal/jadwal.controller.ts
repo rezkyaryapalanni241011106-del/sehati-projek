@@ -73,9 +73,20 @@ export class JadwalController {
 
     if (!newStatus) {
       const bookings = await this.model.findBookingAktifByJadwal(id);
-      bookings.forEach((b: any) => {
-        console.log(`[NOTIF MOCK] Booking ${b.id} — Jadwal dinonaktifkan. Pasien: ${b.nama_lengkap} (${b.nomor_hp})`);
-      });
+      if (bookings.length > 0) {
+        await this.model.batalkanBookingByJadwal(id);
+        for (const b of bookings) {
+          await logAudit({
+            req, user: req.user,
+            aktivitas: 'BATAL_OTOMATIS_JADWAL_DIBLOKIR',
+            tabel_target: 'Kunjungan', id_target: b.id,
+            status: 'sukses',
+            keterangan: `Auto-batal: jadwal dinonaktifkan. Pasien: ${b.nama_lengkap} (${b.nomor_hp})`,
+          });
+        }
+        const daftarPasien = bookings.map((b: any) => `${b.nama_lengkap} (${b.nomor_hp})`).join(', ');
+        req.flash('error', `${bookings.length} booking otomatis dibatalkan. Hubungi pasien: ${daftarPasien}`);
+      }
     }
 
     await logAudit({ req, user: req.user, aktivitas: 'TOGGLE_JADWAL', tabel_target: 'Jadwal_Praktek', id_target: id, status: 'sukses' });

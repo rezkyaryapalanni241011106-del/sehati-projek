@@ -80,4 +80,24 @@ export class BookingModel {
       [kunjunganId]
     );
   }
+
+  async findKunjunganDetail(kunjunganId: string, pasienId: string): Promise<any | null> {
+    const [rows] = await pool.execute<any[]>(
+      `SELECT k.id, k.id_dokter, k.id_jadwal, k.tanggal, k.slot_jam, k.status,
+              u.nama_lengkap AS nama_dokter, s.nama AS spesialisasi
+       FROM Kunjungan k
+       JOIN Users u ON k.id_dokter = u.id
+       LEFT JOIN Spesialisasi s ON u.spesialisasi = s.id
+       WHERE k.id = ? AND k.id_pasien = ? LIMIT 1`,
+      [kunjunganId, pasienId]
+    );
+    return rows[0] ?? null;
+  }
+
+  async reschedule(kunjunganId: string, idJadwal: string, tanggal: string, slotJam: string): Promise<void> {
+    await pool.execute(
+      `UPDATE Kunjungan SET id_jadwal = ?, tanggal = ?, slot_jam = ?, updated_at = NOW() WHERE id = ?`,
+      [idJadwal, tanggal, slotJam, kunjunganId]
+    );
+  }
 }

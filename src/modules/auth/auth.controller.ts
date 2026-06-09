@@ -256,6 +256,74 @@ export class AuthController {
     });
   };
 
+  showUbahPassword = (req: Request, res: Response): void => {
+    res.render('auth/ubah-password', { title: 'Ubah Password', user: req.user });
+  };
+
+  prosesUbahPassword = async (req: Request, res: Response): Promise<void> => {
+    const { password_lama, password_baru, konfirmasi_baru } = req.body;
+    const userId = req.user!.sub;
+
+    if (!password_lama || !password_baru || !konfirmasi_baru) {
+      req.flash('error', 'Semua field wajib diisi.');
+      res.redirect('/auth/ubah-password');
+      return;
+    }
+
+    if (password_baru.length < 8) {
+      req.flash('error', 'Password baru minimal 8 karakter.');
+      res.redirect('/auth/ubah-password');
+      return;
+    }
+
+    if (password_baru !== konfirmasi_baru) {
+      req.flash('error', 'Konfirmasi password tidak cocok.');
+      res.redirect('/auth/ubah-password');
+      return;
+    }
+
+    const user = await this.model.findUserById(userId);
+    if (!user || !user.password_hash) {
+      req.flash('error', 'Pengguna tidak ditemukan.');
+      res.redirect('/auth/ubah-password');
+      return;
+    }
+
+    const passOk = await bcrypt.compare(password_lama, user.password_hash);
+    if (!passOk) {
+      req.flash('error', 'Password lama tidak cocok.');
+      res.redirect('/auth/ubah-password');
+      return;
+    }
+
+    const sameBcrypt = await bcrypt.compare(password_baru, user.password_hash);
+    if (sameBcrypt) {
+      req.flash('error', 'Password baru tidak boleh sama dengan password lama.');
+      res.redirect('/auth/ubah-password');
+      return;
+    }
+
+    const newHash = await bcrypt.hash(password_baru, 12);
+    await this.model.updatePassword(userId, newHash);
+
+    await logAudit({
+      req, user: req.user,
+      aktivitas: 'UBAH_PASSWORD_SENDIRI',
+      tabel_target: 'Users', id_target: userId,
+      status: 'sukses',
+    });
+
+    const redirectMap: Record<string, string> = {
+      admin: '/admin',
+      dokter: '/antrian',
+      perawat: '/kedatangan',
+      resepsionis: '/kedatangan',
+    };
+
+    req.flash('success', 'Password berhasil diubah.');
+    res.redirect(redirectMap[req.user!.peran] ?? '/auth/login');
+  };
+
   // ============================================================
   // Setup MFA — tampilkan QR code
   // ============================================================

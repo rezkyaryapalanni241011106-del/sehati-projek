@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jadwalkan Ulang · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/patient.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+  <script>window.addEventListener('pageshow',function(e){if(e.persisted){document.documentElement.style.visibility='hidden';window.location.replace(window.location.href);}});</script>
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="/">
+    <span class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+    </span>
+    <span class="logo-text">SEHATI<span class="sub">RME</span></span>
+  </a>
+  <nav class="topnav">
+    <a href="/pasien/dashboard">Dashboard</a>
+    <a href="/pasien/booking" class="active">Booking</a>
+    <a href="/pasien/riwayat">Riwayat</a>
+  </nav>
+  <div class="topbar-user">
+    <span class="chip"><%= user.nama %></span>
+    <a class="back-link" href="/auth/pasien/logout">Keluar</a>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <% if (locals.flash_error) { %><div class="flash error"><%= flash_error %></div><% } %>
+    <% if (locals.flash_success) { %><div class="flash success"><%= flash_success %></div><% } %>
+
+    <div class="page-head">
+      <div>
+        <div class="meta">Portal Pasien</div>
+        <h1>Jadwalkan Ulang</h1>
+      </div>
+      <a href="/pasien/dashboard" class="back-link">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Kembali
+      </a>
+    </div>
+
+    <div class="card card-padded" style="max-width:640px; margin-bottom:16px; background:var(--bg-soft); border-left:3px solid var(--accent);">
+      <div style="font-size:13px; color:var(--ink-muted); margin-bottom:4px;">Jadwal saat ini</div>
+      <div style="font-weight:600;">
+        <%= new Date(kunjungan.tanggal).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) %>
+        · <%= kunjungan.slot_jam ? kunjungan.slot_jam.substring(0,5) : '' %>
+      </div>
+      <div style="font-size:14px; color:var(--ink-soft); margin-top:2px;">
+        dr. <%= kunjungan.nama_dokter %><% if (kunjungan.spesialisasi) { %> · <%= kunjungan.spesialisasi %><% } %>
+      </div>
+    </div>
+
+    <div class="card card-padded" style="max-width:640px;">
+      <form method="POST" action="/booking/<%= kunjungan.id %>/reschedule" id="formReschedule">
+        <input type="hidden" id="id_jadwal" name="id_jadwal">
+
+        <div class="form-group">
+          <label class="form-label">Tanggal Baru *</label>
+          <input type="date" id="tanggal" name="tanggal" class="form-input" required
+                 min="<%= new Date().toISOString().split('T')[0] %>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Spesialisasi</label>
+          <select id="spesialisasi" class="form-input">
+            <option value="">Semua Spesialisasi</option>
+            <% spesialisasiList.forEach(function(s) { %>
+              <option value="<%= s.id %>"><%= s.nama %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div class="form-group" id="dokterGroup" style="display:none">
+          <label class="form-label">Dokter *</label>
+          <select id="id_dokter" name="id_dokter" class="form-input" required>
+            <option value="">Pilih Dokter</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="slotGroup" style="display:none">
+          <label class="form-label">Jam Kunjungan *</label>
+          <div id="slotContainer" class="slot-grid" style="margin-top:10px;"></div>
+          <input type="hidden" id="slot_jam" name="slot_jam" required>
+        </div>
+
+        <div class="form-group" style="margin-top:24px;">
+          <button type="submit" class="btn btn-primary btn-block" id="btnSubmit" disabled>
+            Konfirmasi Jadwal Ulang
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+(function() {
+  const tanggalEl = document.getElementById('tanggal');
+  const spesialisasiEl = document.getElementById('spesialisasi');
+  const dokterSelect = document.getElementById('id_dokter');
+  const dokterGroup = document.getElementById('dokterGroup');
+  const slotGroup = document.getElementById('slotGroup');
+  const slotContainer = document.getElementById('slotContainer');
+  const slotJamInput = document.getElementById('slot_jam');
+  const jadwalInput = document.getElementById('id_jadwal');
+  const btnSubmit = document.getElementById('btnSubmit');
+
+  async function loadDokter() {
+    const t = tanggalEl.value, sp = spesialisasiEl.value;
+    if (!t) return;
+    const r = await fetch('/booking/dokter?tanggal=' + t + '&spesialisasi=' + sp);
+    const data = await r.json();
+    dokterSelect.innerHTML = '<option value="">Pilih Dokter</option>' +
+      data.dokters.map(d => '<option value="' + d.id + '">' + d.nama_lengkap + (d.spesialisasi_nama ? ' · ' + d.spesialisasi_nama : '') + '</option>').join('');
+    dokterGroup.style.display = data.dokters.length ? 'block' : 'none';
+    slotGroup.style.display = 'none';
+    btnSubmit.disabled = true;
+  }
+
+  async function loadSlots() {
+    const t = tanggalEl.value, d = dokterSelect.value;
+    if (!t || !d) return;
+    const r = await fetch('/booking/slots?id_dokter=' + d + '&tanggal=' + t);
+    const data = await r.json();
+    jadwalInput.value = data.jadwal_id || '';
+    slotContainer.innerHTML = data.slots.map(s =>
+      '<button type="button" class="slot ' + (s.tersedia ? 'slot-free' : 'slot-taken') + '" ' +
+      (s.tersedia ? '' : 'disabled') +
+      ' onclick="pilihSlot(\'' + s.jam + '\', this)">' + s.jam_display + '</button>'
+    ).join('') || '<p class="muted">Tidak ada slot tersedia untuk hari ini.</p>';
+    slotGroup.style.display = 'block';
+    slotJamInput.value = '';
+    btnSubmit.disabled = true;
+  }
+
+  window.pilihSlot = function(jam, el) {
+    document.querySelectorAll('.slot-free').forEach(b => b.style.background = '');
+    el.style.background = 'var(--accent)';
+    el.style.color = '#fff';
+    slotJamInput.value = jam;
+    btnSubmit.disabled = false;
+  };
+
+  tanggalEl.addEventListener('change', () => { loadDokter(); slotGroup.style.display='none'; });
+  spesialisasiEl.addEventListener('change', loadDokter);
+  dokterSelect.addEventListener('change', loadSlots);
+})();
+</script>
+<script src="/public/js/auth-guard.js"></script>
+</body>
+</html>

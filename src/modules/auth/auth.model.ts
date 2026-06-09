@@ -19,10 +19,17 @@ export class AuthModel {
 
   async findUserById(id: string): Promise<any | null> {
     const [rows] = await pool.execute<any[]>(
-      'SELECT totp_secret, username, peran FROM Users WHERE id = ? LIMIT 1',
+      'SELECT id, username, peran, nama_lengkap, password_hash, totp_secret FROM Users WHERE id = ? LIMIT 1',
       [id]
     );
     return rows[0] ?? null;
+  }
+
+  async updatePassword(id: string, passwordHash: string): Promise<void> {
+    await pool.execute(
+      'UPDATE Users SET password_hash = ? WHERE id = ?',
+      [passwordHash, id]
+    );
   }
 
   async saveTotpSecret(userId: string, secret: string): Promise<void> {

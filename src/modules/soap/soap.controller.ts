@@ -36,6 +36,7 @@ export class SoapController {
     const obatHistory = await this.model.findObatHistory(dokterId);
 
     const locked = kunjungan.status === 'selesai';
+    const koreksiList = locked ? await this.model.findKoreksiByKunjungan(kunjunganId) : [];
     res.render('dokter/soap', {
       title: 'Form SOAP',
       kunjungan,
@@ -45,6 +46,7 @@ export class SoapController {
       obatHistory,
       readonly: locked,
       locked,
+      koreksiList,
     });
   };
 
@@ -133,6 +135,44 @@ export class SoapController {
     if (io) emitQueueUpdate(io, dokterId, 'remove', { kunjungan_id: kunjunganId });
 
     req.flash('success', 'Catatan SOAP berhasil disimpan. Status kunjungan: Selesai.');
+    res.redirect('/antrian');
+  };
+
+  simpanKoreksi = async (req: Request, res: Response): Promise<void> => {
+    const kunjunganId = req.params.kunjunganId;
+    const dokterId = req.user!.sub;
+    const { catatan } = req.body;
+
+    if (!catatan || catatan.trim().length < 10) {
+      req.flash('error', 'Catatan koreksi minimal 10 karakter.');
+      res.redirect(`/soap/${kunjunganId}`);
+      return;
+    }
+
+    const kunjungan = await this.model.findKunjunganDokter(kunjunganId, dokterId);
+    if (!kunjungan || kunjungan.status !== 'selesai') {
+      req.flash('error', 'Koreksi hanya bisa ditambahkan pada catatan yang sudah selesai.');
+      res.redirect(`/soap/${kunjunganId}`);
+      return;
+    }
+
+    const soap = await this.model.findSoap(kunjunganId);
+    if (!soap) {
+      req.flash('error', 'Data SOAP tidak ditemukan.');
+      res.redirect(`/soap/${kunjunganId}`);
+      return;
+    }
+
+    await this.model.simpanKoreksi(soap.id, dokterId, catatan.trim());
+
+    await logAudit({
+      req, user: req.user,
+      aktivitas: 'TAMBAH_KOREKSI_SOAP',
+      tabel_target: 'Koreksi_SOAP', id_target: soap.id,
+      status: 'sukses',
+    });
+
+    req.flash('success', 'Catatan koreksi berhasil disimpan.');
     res.redirect(`/soap/${kunjunganId}`);
   };
 }

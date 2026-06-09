@@ -14,9 +14,10 @@ export class AntrianController {
     const dokterId = req.user!.sub;
     const tanggal = await this.model.getTanggalHariIni();
 
-    const [antrian, standby, jumlah_selesai, jumlah_booked, dokterInfo] = await Promise.all([
+    const [antrian, standby, selesaiHariIni, jumlah_selesai, jumlah_booked, dokterInfo] = await Promise.all([
       this.model.findAntrianAktif(dokterId, tanggal),
       this.model.findStandby(dokterId, tanggal),
+      this.model.findSelesaiHariIni(dokterId, tanggal),
       this.model.countKunjunganByStatus(dokterId, tanggal, 'selesai'),
       this.model.countKunjunganByStatus(dokterId, tanggal, 'booked'),
       this.model.findDokterInfo(dokterId),
@@ -26,6 +27,7 @@ export class AntrianController {
       title: 'Dashboard Antrian',
       antrian,
       standby,
+      selesaiHariIni,
       dokterId,
       tanggal,
       jumlah_selesai,
