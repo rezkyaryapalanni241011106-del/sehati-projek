@@ -44,11 +44,15 @@ export class AuthController {
     });
 
     (req.session as any).otp_nomor_hp = nomor_hp;
+    if (env.OTP_MOCK) (req.session as any).otp_mock_kode = kode;
 
-    res.render('auth/pasien-verify-otp', {
-      title: 'Verifikasi OTP',
-      nomor_hp_masked: maskNomorHp(nomor_hp),
-      otp_mock_kode: env.OTP_MOCK ? kode : null,
+    req.session.save((err) => {
+      if (err) {
+        req.flash('error', 'Terjadi kesalahan sesi. Coba lagi.');
+        res.redirect('/auth/pasien/login');
+        return;
+      }
+      res.redirect('/auth/pasien/verify-otp');
     });
   };
 
@@ -58,10 +62,11 @@ export class AuthController {
       res.redirect('/auth/pasien/login');
       return;
     }
+    const otp_mock_kode = env.OTP_MOCK ? (req.session as any).otp_mock_kode ?? null : null;
     res.render('auth/pasien-verify-otp', {
       title: 'Verifikasi OTP',
       nomor_hp_masked: maskNomorHp(nomor_hp),
-      otp_mock_kode: null,
+      otp_mock_kode,
     });
   };
 
