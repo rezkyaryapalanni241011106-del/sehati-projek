@@ -30,6 +30,15 @@ export class OtpService {
   }
 
   async verifikasi(nomorHp: string, kode: string): Promise<boolean> {
+    // DEBUG: lihat semua OTP untuk nomor ini
+    const [debug] = await pool.execute<any[]>(
+      `SELECT id, kode, digunakan, expired_at, NOW() as server_now,
+              (expired_at > NOW()) as belum_expired
+       FROM OTP WHERE nomor_hp = ? ORDER BY created_at DESC LIMIT 3`,
+      [nomorHp]
+    );
+    console.log('[DEBUG verifikasiOTP] rows di DB:', JSON.stringify(debug));
+
     const [rows] = await pool.execute<any[]>(
       `SELECT id FROM OTP
        WHERE nomor_hp = ?
