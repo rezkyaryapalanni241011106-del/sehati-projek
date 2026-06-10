@@ -11,9 +11,34 @@ export class AntrianController {
   }
 
   dashboardAntrian = async (req: Request, res: Response): Promise<void> => {
-    const dokterId = req.user!.sub;
     const tanggal = await this.model.getTanggalHariIni();
 
+    // Super Admin: tampilkan monitoring semua dokter
+    if (req.user!.peran === 'super_admin') {
+      const semuaDokter = await this.model.findMonitoringSemuaDokter(tanggal);
+
+      // Jika ada filter dokter tertentu via query param
+      const filterDokter = req.query.dokter as string | undefined;
+      let detailAntrian: any[] = [];
+      let dokterDipilih: any = null;
+      if (filterDokter) {
+        dokterDipilih = semuaDokter.find((d: any) => d.dokter_id === filterDokter) || null;
+        detailAntrian = await this.model.findAntrianDokterById(filterDokter, tanggal);
+      }
+
+      res.render('superadmin/monitoring-antrian', {
+        title: 'Monitoring Antrian Hari Ini',
+        semuaDokter,
+        tanggal,
+        detailAntrian,
+        dokterDipilih,
+        filterDokter: filterDokter || null,
+      });
+      return;
+    }
+
+    // Dokter: tampilkan antrian milik sendiri
+    const dokterId = req.user!.sub;
     const [antrian, standby, selesaiHariIni, jumlah_selesai, jumlah_booked, dokterInfo] = await Promise.all([
       this.model.findAntrianAktif(dokterId, tanggal),
       this.model.findStandby(dokterId, tanggal),

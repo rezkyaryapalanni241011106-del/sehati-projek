@@ -101,4 +101,42 @@ export class AntrianModel {
     );
     return row.tanggal;
   }
+
+  // Monitoring Super Admin — semua dokter aktif hari ini beserta status antrian
+  async findMonitoringSemuaDokter(tanggal: string): Promise<any[]> {
+    const [rows] = await pool.execute<any[]>(
+      `SELECT
+         u.id AS dokter_id,
+         u.nama_lengkap AS nama_dokter,
+         s.nama AS spesialisasi,
+         COALESCE(SUM(k.status = 'hadir'),   0) AS jumlah_hadir,
+         COALESCE(SUM(k.status = 'selesai'), 0) AS jumlah_selesai,
+         COALESCE(SUM(k.status = 'booked'),  0) AS jumlah_booked,
+         COALESCE(SUM(k.status = 'skip'),    0) AS jumlah_skip,
+         COALESCE(COUNT(k.id),               0) AS jumlah_total
+       FROM Users u
+       LEFT JOIN Spesialisasi s ON u.spesialisasi = s.id
+       LEFT JOIN Kunjungan k ON k.id_dokter = u.id AND k.tanggal = ?
+       WHERE u.peran = 'dokter' AND u.status_aktif = 1
+       GROUP BY u.id, u.nama_lengkap, s.nama
+       ORDER BY jumlah_hadir DESC, u.nama_lengkap ASC`,
+      [tanggal]
+    );
+    return rows;
+  }
+
+  // Detail antrian satu dokter untuk Super Admin (read-only)
+  async findAntrianDokterById(dokterId: string, tanggal: string): Promise<any[]> {
+    const [rows] = await pool.execute<any[]>(
+      `SELECT k.id, k.slot_jam, k.keluhan_awal, k.waktu_konfirmasi, k.status,
+              p.nama_lengkap AS nama_pasien, p.nomor_rm,
+              TIMESTAMPDIFF(YEAR, p.tanggal_lahir, CURDATE()) AS usia
+       FROM Kunjungan k
+       JOIN Pasien p ON k.id_pasien = p.id
+       WHERE k.id_dokter = ? AND k.tanggal = ? AND k.status IN ('hadir','skip')
+       ORDER BY FIELD(k.status,'hadir','skip'), k.waktu_konfirmasi ASC`,
+      [dokterId, tanggal]
+    );
+    return rows;
+  }
 }
