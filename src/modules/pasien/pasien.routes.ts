@@ -18,6 +18,10 @@ router.get('/booking', (req, res) => res.redirect('/booking'));
 router.get('/dashboard', ctrl.dashboard);
 router.get('/profil', ctrl.showProfil);
 router.post('/profil', ctrl.updateProfil);
+router.get('/ganti-hp', ctrl.showGantiHP);
+router.post('/ganti-hp', ctrl.requestGantiHP);
+router.get('/ganti-hp/verifikasi', ctrl.showVerifikasiGantiHP);
+router.post('/ganti-hp/verifikasi', ctrl.verifikasiGantiHP);
 router.get('/riwayat', riwayatCtrl.riwayatPasien);
 router.get('/riwayat/:kunjunganId', riwayatCtrl.detailRiwayatPasien);
 

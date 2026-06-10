@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ganti Nomor HP · SEHATI</title>
+  <link rel="stylesheet" href="/public/css/base.css">
+  <link rel="stylesheet" href="/public/css/patient.css">
+  <link rel="stylesheet" href="/public/css/sehati.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="/">
+    <span class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
+    </span>
+    <span class="logo-text">SEHATI<span class="sub">RME</span></span>
+  </a>
+</header>
+
+<main class="center-page">
+  <div class="auth-card">
+    <a href="/pasien/dashboard" class="back-link">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Kembali ke Dashboard
+    </a>
+    <div class="eyebrow">PENGATURAN AKUN</div>
+    <h1>Ganti Nomor HP</h1>
+    <p class="lede">Nomor HP saat ini: <b><%= nomor_hp_masked %></b>.<br>Masukkan nomor baru — kode OTP akan dikirim via WhatsApp untuk verifikasi.</p>
+
+    <% if (locals.flash_error) { %>
+      <div class="alert alert-warning"><%= flash_error %></div>
+    <% } %>
+
+    <form method="POST" action="/pasien/ganti-hp">
+      <div class="field">
+        <label for="nomor_hp_baru">Nomor HP Baru</label>
+        <input
+          type="tel"
+          id="nomor_hp_baru"
+          name="nomor_hp_baru"
+          placeholder="08xxxxxxxxxx"
+          inputmode="numeric"
+          maxlength="14"
+          autocomplete="tel"
+          required
+        >
+        <div class="field-hint">Format: 08xx-xxxx-xxxx (tanpa tanda hubung)</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        Kirim Kode OTP
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </button>
+    </form>
+  </div>
+</main>
+<script src="/public/js/auth-guard.js"></script>
+</body>
+</html>

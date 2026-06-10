@@ -196,6 +196,22 @@
       <% } %>
     </div>
 
+    <!-- Pengaturan Akun -->
+    <% if (pasien && pasien.nomor_hp) { %>
+    <div class="dash-card">
+      <div class="dash-card-head">
+        <h3>Pengaturan Akun</h3>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <div style="font-size:12px; color:var(--ink-soft); margin-bottom:2px;">Nomor HP (untuk OTP login)</div>
+          <div style="font-size:15px; font-weight:600; letter-spacing:0.05em;"><%= maskNomorHp(pasien.nomor_hp) %></div>
+        </div>
+        <a href="/pasien/ganti-hp" class="btn btn-ghost btn-sm">Ganti Nomor HP</a>
+      </div>
+    </div>
+    <% } %>
+
     <!-- Riwayat Terakhir -->
     <div class="dash-card">
       <div class="dash-card-head">

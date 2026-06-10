@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verifikasi OTP · SEHATI</title>
+  <title>Verifikasi Nomor HP Baru · SEHATI</title>
   <link rel="stylesheet" href="/public/css/base.css">
   <link rel="stylesheet" href="/public/css/patient.css">
   <link rel="stylesheet" href="/public/css/sehati.css">
@@ -16,19 +16,15 @@
     </span>
     <span class="logo-text">SEHATI<span class="sub">RME</span></span>
   </a>
-  <span class="chip">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9 2.5 5 6.5 5 9 5 12 8 12 8s3-3 5.5-3C21.5 5 23 9 21.5 12.5 19 16.65 12 21 12 21z"></path></svg>
-    Klinik SEHATI · Rawat Jalan
-  </span>
 </header>
 
 <main class="center-page">
   <div class="auth-card">
-    <a href="/auth/pasien/login" class="back-link">
+    <a href="/pasien/ganti-hp" class="back-link">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      Kembali
+      Ganti Nomor
     </a>
-    <div class="eyebrow">PORTAL PASIEN · LOGIN 2/2</div>
+    <div class="eyebrow">PENGATURAN AKUN · VERIFIKASI</div>
     <h1>Masukkan Kode OTP</h1>
     <p class="lede">Kode 6 digit dikirim ke <b><%= nomor_hp_masked %></b>. Berlaku 5 menit.</p>
 
@@ -43,7 +39,7 @@
       </div>
     <% } %>
 
-    <form method="POST" action="/auth/pasien/verify-otp">
+    <form method="POST" action="/pasien/ganti-hp/verifikasi">
       <div class="otp-row" id="otpRow">
         <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
         <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
@@ -56,11 +52,11 @@
 
       <div class="otp-meta" style="margin-bottom:18px;">
         <span id="countdown">Kode berlaku 5:00</span> &nbsp;·&nbsp;
-        <a href="/auth/pasien/login" style="color:var(--accent); font-weight:600;">Kirim ulang</a>
+        <a href="/pasien/ganti-hp" style="color:var(--accent); font-weight:600;">Kirim ulang</a>
       </div>
 
       <button type="submit" class="btn btn-primary btn-block" id="btnVerify" disabled>
-        Verifikasi
+        Konfirmasi Ganti Nomor HP
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       </button>
     </form>
@@ -94,7 +90,6 @@
       this.classList.toggle('filled', !!this.value);
       update();
     });
-    // Tangkap autofill browser (tidak selalu trigger 'input')
     box.addEventListener('change', function() {
       this.value = this.value.replace(/\D/g,'').slice(-1);
       this.classList.toggle('filled', !!this.value);
@@ -112,19 +107,13 @@
     });
   });
 
-  // Pastikan hidden field selalu sinkron saat form submit
-  document.querySelector('form').addEventListener('submit', function() {
-    update();
-  });
+  document.querySelector('form').addEventListener('submit', function() { update(); });
 
-  // Klik kode demo untuk isi otomatis
   var demoCode = document.getElementById('demoCode');
   if (demoCode) {
     demoCode.style.cursor = 'pointer';
     demoCode.title = 'Klik untuk isi otomatis';
-    demoCode.addEventListener('click', function() {
-      fillBoxes(this.textContent.trim());
-    });
+    demoCode.addEventListener('click', function() { fillBoxes(this.textContent.trim()); });
   }
 
   let sec = 300;
@@ -134,7 +123,6 @@
     if (sec <= 0) {
       clearInterval(t);
       cd.textContent = 'Kode kedaluwarsa';
-      // Nonaktifkan form saat kode habis
       btn.disabled = true;
       btn.textContent = 'Kode Kedaluwarsa';
       boxes.forEach(function(b) { b.disabled = true; });
@@ -145,5 +133,6 @@
   }, 1000);
 })();
 </script>
+<script src="/public/js/auth-guard.js"></script>
 </body>
 </html>

@@ -83,6 +83,18 @@ CREATE TABLE IF NOT EXISTS OTP (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
+-- 4b. OTP_Attempt (rate limiting per-nomor HP)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS OTP_Attempt (
+  id         VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
+  nomor_hp   VARCHAR(20)  NOT NULL,
+  jenis      ENUM('request','verify') NOT NULL,
+  sukses     TINYINT(1)   NOT NULL DEFAULT 0,
+  created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_attempt_hp_waktu (nomor_hp, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
 -- 5. ICD10
 -- ============================================================
 CREATE TABLE IF NOT EXISTS ICD10 (

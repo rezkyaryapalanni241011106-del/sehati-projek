@@ -53,3 +53,19 @@ export const env = {
 
   isProd: () => process.env.NODE_ENV === 'production',
 };
+
+// Validasi saat startup: jika OTP nyata diaktifkan, kredensial WA harus ada
+if (!env.OTP_MOCK) {
+  if (env.WA_PROVIDER === 'meta') {
+    if (!process.env.WA_PHONE_NUMBER_ID || process.env.WA_PHONE_NUMBER_ID.startsWith('ISI_')) {
+      throw new Error('[SEHATI] WA_PROVIDER=meta tapi WA_PHONE_NUMBER_ID belum diisi di .env');
+    }
+    if (!process.env.WA_ACCESS_TOKEN || process.env.WA_ACCESS_TOKEN.startsWith('ISI_')) {
+      throw new Error('[SEHATI] WA_PROVIDER=meta tapi WA_ACCESS_TOKEN belum diisi di .env');
+    }
+  } else if (env.WA_PROVIDER === 'fonnte') {
+    if (!process.env.FONNTE_TOKEN) {
+      throw new Error('[SEHATI] WA_PROVIDER=fonnte tapi FONNTE_TOKEN belum diisi di .env');
+    }
+  }
+}

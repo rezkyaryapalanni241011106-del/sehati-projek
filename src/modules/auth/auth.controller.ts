@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
-import { buatOTP, verifikasiOTP } from '../../utils/otp';
+import { buatOTP, verifikasiOTP, cekBatasRequestOTP, cekBatasVerifyOTP, catatAttemptOTP } from '../../utils/otp';
 import { signToken, setTokenCookie } from '../../middleware/auth';
 import { logAudit } from '../../utils/auditLogger';
 import { env } from '../../config/env';
@@ -33,6 +33,15 @@ export class AuthController {
       return;
     }
 
+    // Rate limit per-nomor HP: maks 3 request per jam
+    const melebihiBatas = await cekBatasRequestOTP(nomor_hp);
+    if (melebihiBatas) {
+      req.flash('error', 'Terlalu banyak permintaan OTP. Coba lagi dalam 1 jam.');
+      res.redirect('/auth/pasien/login');
+      return;
+    }
+
+    await catatAttemptOTP(nomor_hp, 'request', true);
     const kode = await buatOTP(nomor_hp);
 
     await logAudit({
@@ -85,14 +94,25 @@ export class AuthController {
       return;
     }
 
+    // Rate limit per-nomor HP: maks 5 percobaan gagal per 15 menit
+    const melebihiBatasVerify = await cekBatasVerifyOTP(nomor_hp);
+    if (melebihiBatasVerify) {
+      req.flash('error', 'Terlalu banyak percobaan gagal. Minta kode OTP baru dan coba lagi dalam 15 menit.');
+      res.redirect('/auth/pasien/login');
+      return;
+    }
+
     const valid = await verifikasiOTP(nomor_hp, kode.trim());
 
     if (!valid) {
+      await catatAttemptOTP(nomor_hp, 'verify', false);
       await logAudit({ req, aktivitas: 'LOGIN_PASIEN', status: 'gagal', keterangan: `OTP salah untuk ${maskNomorHp(nomor_hp)}` });
       req.flash('error', 'Kode OTP salah atau sudah kedaluwarsa. Minta kode baru.');
       res.redirect('/auth/pasien/login');
       return;
     }
+
+    await catatAttemptOTP(nomor_hp, 'verify', true);
 
     const pasien = await this.model.findPasienByNomorHp(nomor_hp);
 

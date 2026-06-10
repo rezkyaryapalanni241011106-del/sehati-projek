@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { logAudit } from '../../utils/auditLogger';
 import { generateNomorRM } from '../../utils/nomorRM';
 import { signToken, setTokenCookie } from '../../middleware/auth';
-import { hitungUsia, tanggalIndonesia } from '../../utils/helpers';
+import { hitungUsia, tanggalIndonesia, maskNomorHp } from '../../utils/helpers';
+import { buatOTP, verifikasiOTP, cekBatasRequestOTP, cekBatasVerifyOTP, catatAttemptOTP } from '../../utils/otp';
+import { env } from '../../config/env';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 import { PasienModel } from './pasien.model';
@@ -124,6 +126,7 @@ export class PasienController {
       riwayat,
       hitungUsia,
       tanggalIndonesia,
+      maskNomorHp,
     });
   };
 
@@ -139,6 +142,21 @@ export class PasienController {
   updateProfil = async (req: Request, res: Response): Promise<void> => {
     const pasienId = req.user!.sub;
     const { alamat, nomor_hp, pekerjaan, pendidikan, status_perkawinan, agama, golongan_darah, alergi, riwayat_kronis } = req.body;
+
+    // Validasi format nomor HP
+    if (!nomor_hp || !/^08\d{8,11}$/.test(nomor_hp)) {
+      req.flash('error', 'Format nomor HP tidak valid. Contoh: 08123456789');
+      res.redirect('/pasien/profil');
+      return;
+    }
+
+    // Cek uniqueness nomor HP — tolak jika sudah dipakai pasien lain
+    const existing = await this.model.findByNomorHp(nomor_hp);
+    if (existing && existing.id !== pasienId) {
+      req.flash('error', 'Nomor HP sudah digunakan oleh akun lain.');
+      res.redirect('/pasien/profil');
+      return;
+    }
 
     await this.model.update(pasienId, {
       alamat, nomor_hp,
@@ -160,5 +178,112 @@ export class PasienController {
 
     req.flash('success', 'Profil berhasil diperbarui.');
     res.redirect('/pasien/profil');
+  };
+
+  showGantiHP = async (req: Request, res: Response): Promise<void> => {
+    const pasien = await this.model.findById(req.user!.sub);
+    if (!pasien) { res.redirect('/pasien/dashboard'); return; }
+    res.render('pasien/ganti-hp', {
+      title: 'Ganti Nomor HP',
+      nomor_hp_masked: maskNomorHp(pasien.nomor_hp),
+    });
+  };
+
+  requestGantiHP = async (req: Request, res: Response): Promise<void> => {
+    const pasienId = req.user!.sub;
+    const { nomor_hp_baru } = req.body as { nomor_hp_baru: string };
+
+    if (!nomor_hp_baru || !/^08\d{8,11}$/.test(nomor_hp_baru)) {
+      req.flash('error', 'Format nomor HP tidak valid. Contoh: 08123456789');
+      res.redirect('/pasien/ganti-hp');
+      return;
+    }
+
+    const existing = await this.model.findByNomorHp(nomor_hp_baru);
+    if (existing && existing.id !== pasienId) {
+      req.flash('error', 'Nomor HP sudah digunakan oleh akun lain.');
+      res.redirect('/pasien/ganti-hp');
+      return;
+    }
+
+    const pasien = await this.model.findById(pasienId);
+    if (pasien && pasien.nomor_hp === nomor_hp_baru) {
+      req.flash('error', 'Nomor HP baru tidak boleh sama dengan nomor HP saat ini.');
+      res.redirect('/pasien/ganti-hp');
+      return;
+    }
+
+    const melebihiBatas = await cekBatasRequestOTP(nomor_hp_baru);
+    if (melebihiBatas) {
+      req.flash('error', 'Terlalu banyak permintaan OTP. Coba lagi dalam 1 jam.');
+      res.redirect('/pasien/ganti-hp');
+      return;
+    }
+
+    await catatAttemptOTP(nomor_hp_baru, 'request', true);
+    const kode = await buatOTP(nomor_hp_baru);
+
+    (req.session as any).ganti_hp_pending = nomor_hp_baru;
+    if (env.OTP_MOCK) (req.session as any).ganti_hp_mock_kode = kode;
+
+    req.session.save((err) => {
+      if (err) {
+        req.flash('error', 'Terjadi kesalahan sesi. Coba lagi.');
+        res.redirect('/pasien/ganti-hp');
+        return;
+      }
+      res.redirect('/pasien/ganti-hp/verifikasi');
+    });
+  };
+
+  showVerifikasiGantiHP = (req: Request, res: Response): void => {
+    const nomor_hp_baru = (req.session as any).ganti_hp_pending;
+    if (!nomor_hp_baru) { res.redirect('/pasien/ganti-hp'); return; }
+    const otp_mock_kode = env.OTP_MOCK ? (req.session as any).ganti_hp_mock_kode ?? null : null;
+    res.render('pasien/ganti-hp-verifikasi', {
+      title: 'Verifikasi Nomor HP Baru',
+      nomor_hp_masked: maskNomorHp(nomor_hp_baru),
+      otp_mock_kode,
+    });
+  };
+
+  verifikasiGantiHP = async (req: Request, res: Response): Promise<void> => {
+    const pasienId = req.user!.sub;
+    const nomor_hp_baru = (req.session as any).ganti_hp_pending as string | undefined;
+    if (!nomor_hp_baru) { res.redirect('/pasien/ganti-hp'); return; }
+
+    const { kode } = req.body as { kode: string };
+
+    const melebihiBatas = await cekBatasVerifyOTP(nomor_hp_baru);
+    if (melebihiBatas) {
+      req.flash('error', 'Terlalu banyak percobaan verifikasi. Coba lagi dalam 15 menit.');
+      res.redirect('/pasien/ganti-hp/verifikasi');
+      return;
+    }
+
+    const valid = await verifikasiOTP(nomor_hp_baru, kode);
+    await catatAttemptOTP(nomor_hp_baru, 'verify', valid);
+
+    if (!valid) {
+      req.flash('error', 'Kode OTP tidak valid atau sudah kedaluwarsa.');
+      res.redirect('/pasien/ganti-hp/verifikasi');
+      return;
+    }
+
+    await this.model.updateNomorHp(pasienId, nomor_hp_baru);
+
+    delete (req.session as any).ganti_hp_pending;
+    delete (req.session as any).ganti_hp_mock_kode;
+
+    await logAudit({
+      req, user: req.user,
+      aktivitas: 'GANTI_NOMOR_HP',
+      tabel_target: 'Pasien', id_target: pasienId,
+      status: 'sukses',
+      keterangan: `Nomor HP diubah ke ${maskNomorHp(nomor_hp_baru)}`,
+    });
+
+    req.flash('success', 'Nomor HP berhasil diperbarui.');
+    res.redirect('/pasien/dashboard');
   };
 }

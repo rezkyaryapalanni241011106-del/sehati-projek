@@ -102,9 +102,37 @@ export class SoapController {
       return;
     }
 
+    // Validasi rentang vital signs
+    const tdSis = body.td_sistolik ? parseInt(body.td_sistolik) : null;
+    const tdDia = body.td_diastolik ? parseInt(body.td_diastolik) : null;
+    const nadi  = body.nadi  ? parseInt(body.nadi)  : null;
+    const suhu  = body.suhu  ? parseFloat(body.suhu) : null;
+    const spo2  = body.spo2  ? parseInt(body.spo2)  : null;
+
+    if (tdSis !== null && (tdSis < 50 || tdSis > 300)) {
+      req.flash('error', 'Tekanan darah sistolik harus antara 50–300 mmHg.');
+      res.redirect(`/soap/${kunjunganId}`); return;
+    }
+    if (tdDia !== null && (tdDia < 30 || tdDia > 200)) {
+      req.flash('error', 'Tekanan darah diastolik harus antara 30–200 mmHg.');
+      res.redirect(`/soap/${kunjunganId}`); return;
+    }
+    if (nadi !== null && (nadi < 20 || nadi > 300)) {
+      req.flash('error', 'Nadi harus antara 20–300 bpm.');
+      res.redirect(`/soap/${kunjunganId}`); return;
+    }
+    if (suhu !== null && (suhu < 30 || suhu > 45)) {
+      req.flash('error', 'Suhu tubuh harus antara 30–45 °C.');
+      res.redirect(`/soap/${kunjunganId}`); return;
+    }
+    if (spo2 !== null && (spo2 < 0 || spo2 > 100)) {
+      req.flash('error', 'SPO2 harus antara 0–100%.');
+      res.redirect(`/soap/${kunjunganId}`); return;
+    }
+
     const bb = body.berat_badan ? parseFloat(body.berat_badan) : null;
     const tb = body.tinggi_badan ? parseFloat(body.tinggi_badan) : null;
-    const imt = bb && tb ? hitungIMT(bb, tb) : null;
+    const imt = bb && tb && tb > 0 ? hitungIMT(bb, tb) : null;
 
     const fileUrl = req.file ? `/public/uploads/${req.file.filename}` : null;
 

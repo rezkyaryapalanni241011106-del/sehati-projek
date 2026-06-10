@@ -50,6 +50,21 @@ export class RiwayatController {
 
   riwayatDokter = async (req: Request, res: Response): Promise<void> => {
     const pasienId = req.params.pasienId;
+    const dokterId = req.user!.sub;
+    const peran = req.user!.peran;
+
+    // Super Admin boleh akses semua — dokter hanya boleh lihat pasien yang pernah ditangani
+    if (peran === 'dokter') {
+      const bolehAkses = await this.model.findKunjunganDokterPasien(dokterId, pasienId);
+      if (!bolehAkses) {
+        res.status(403).render('error', {
+          title: 'Akses Ditolak',
+          message: 'Anda tidak memiliki akses ke riwayat pasien ini.',
+          statusCode: 403,
+        });
+        return;
+      }
+    }
 
     const pasien = await this.model.findPasienById(pasienId);
 

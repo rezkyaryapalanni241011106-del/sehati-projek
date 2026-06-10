@@ -61,6 +61,16 @@ export class RiwayatModel {
     return rows[0] ?? null;
   }
 
+  // Cek apakah dokter pernah menangani pasien ini (minimal 1 kunjungan selesai atau hadir)
+  async findKunjunganDokterPasien(dokterId: string, pasienId: string): Promise<boolean> {
+    const [[row]] = await pool.execute<any[]>(
+      `SELECT COUNT(*) AS jumlah FROM Kunjungan
+       WHERE id_dokter = ? AND id_pasien = ? LIMIT 1`,
+      [dokterId, pasienId]
+    );
+    return row.jumlah > 0;
+  }
+
   async findKunjunganLengkap(pasienId: string): Promise<any[]> {
     const [rows] = await pool.execute<any[]>(
       `SELECT k.id, k.tanggal, k.slot_jam, k.status, k.keluhan_awal,

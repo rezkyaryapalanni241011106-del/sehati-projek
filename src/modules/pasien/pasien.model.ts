@@ -32,6 +32,14 @@ export class PasienModel {
     );
   }
 
+  async findByNomorHp(nomorHp: string): Promise<any | null> {
+    const [rows] = await pool.execute<any[]>(
+      'SELECT id FROM Pasien WHERE nomor_hp = ? LIMIT 1',
+      [nomorHp]
+    );
+    return rows[0] ?? null;
+  }
+
   async findById(id: string): Promise<any | null> {
     const [rows] = await pool.execute<any[]>(
       'SELECT * FROM Pasien WHERE id = ? LIMIT 1',
@@ -40,9 +48,16 @@ export class PasienModel {
     return rows[0] ?? null;
   }
 
+  async updateNomorHp(id: string, nomor_hp: string): Promise<void> {
+    await pool.execute(
+      'UPDATE Pasien SET nomor_hp = ? WHERE id = ?',
+      [nomor_hp, id]
+    );
+  }
+
   async findDashboardData(pasienId: string): Promise<{ pasien: any; mendatang: any[]; riwayat: any[] }> {
     const [pasienRows] = await pool.execute<any[]>(
-      'SELECT nama_lengkap, nomor_rm, tanggal_lahir FROM Pasien WHERE id = ? LIMIT 1',
+      'SELECT nama_lengkap, nomor_rm, tanggal_lahir, nomor_hp FROM Pasien WHERE id = ? LIMIT 1',
       [pasienId]
     );
 
