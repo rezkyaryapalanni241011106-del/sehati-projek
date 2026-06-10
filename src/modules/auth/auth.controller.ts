@@ -48,12 +48,10 @@ export class AuthController {
 
     req.session.save((err) => {
       if (err) {
-        console.log('[DEBUG request-otp] session.save ERROR:', err);
         req.flash('error', 'Terjadi kesalahan sesi. Coba lagi.');
         res.redirect('/auth/pasien/login');
         return;
       }
-      console.log('[DEBUG request-otp] session saved, id:', req.sessionID, '| otp_nomor_hp:', (req.session as any).otp_nomor_hp);
       res.redirect('/auth/pasien/verify-otp');
     });
   };
@@ -76,13 +74,7 @@ export class AuthController {
     const { kode } = req.body as { kode: string };
     const nomor_hp = (req.session as any).otp_nomor_hp as string | undefined;
 
-    console.log('[DEBUG verify-otp] session id:', req.sessionID);
-    console.log('[DEBUG verify-otp] otp_nomor_hp:', nomor_hp);
-    console.log('[DEBUG verify-otp] kode diterima:', JSON.stringify(kode));
-    console.log('[DEBUG verify-otp] session isi:', JSON.stringify(req.session));
-
     if (!nomor_hp) {
-      console.log('[DEBUG verify-otp] REDIRECT — nomor_hp tidak ada di session');
       res.redirect('/auth/pasien/login');
       return;
     }
@@ -94,7 +86,6 @@ export class AuthController {
     }
 
     const valid = await verifikasiOTP(nomor_hp, kode.trim());
-    console.log('[DEBUG verify-otp] hasil verifikasiOTP:', valid);
 
     if (!valid) {
       await logAudit({ req, aktivitas: 'LOGIN_PASIEN', status: 'gagal', keterangan: `OTP salah untuk ${maskNomorHp(nomor_hp)}` });
