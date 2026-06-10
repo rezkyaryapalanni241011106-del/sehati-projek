@@ -391,6 +391,115 @@
 
 <script>
 (function() {
+  // ---- Auto-save draft ke localStorage (cegah hilang data saat reload) ----
+  var DRAFT_KEY = 'soap_draft_<%= kunjungan.id %>';
+  var mainForm = document.getElementById('formSOAP');
+
+  <% if (!locked) { %>
+  if (mainForm) {
+    var DRAFT_FIELDS = ['subjektif','td_sistolik','td_diastolik','nadi','suhu',
+                        'frekuensi_napas','spo2','berat_badan','tinggi_badan',
+                        'pemeriksaan_fisik','hasil_penunjang','tindakan','anjuran'];
+
+    function collectDraft() {
+      var d = {};
+      DRAFT_FIELDS.forEach(function(n) {
+        var el = mainForm.querySelector('[name="' + n + '"]');
+        if (el) d[n] = el.value;
+      });
+      d.kode_dx    = (document.getElementById('kode_dx')    || {}).value || '';
+      d.icd_display= (document.getElementById('icd-search') || {}).value || '';
+      var rows = [];
+      mainForm.querySelectorAll('#resep-body .resep-row').forEach(function(row) {
+        rows.push({
+          nama_obat : (row.querySelector('[name="nama_obat[]"]')  || {}).value || '',
+          dosis     : (row.querySelector('[name="dosis[]"]')      || {}).value || '',
+          frekuensi : (row.querySelector('[name="frekuensi[]"]')  || {}).value || '',
+          durasi    : (row.querySelector('[name="durasi[]"]')     || {}).value || '',
+          jumlah    : (row.querySelector('[name="jumlah[]"]')     || {}).value || '',
+          cara_pakai: (row.querySelector('[name="cara_pakai[]"]') || {}).value || 'oral'
+        });
+      });
+      d.resep = rows;
+      return d;
+    }
+
+    function saveDraft() {
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraft())); } catch(e) {}
+    }
+
+    function restoreDraft() {
+      <% if (soap) { %>
+        localStorage.removeItem(DRAFT_KEY); return;
+      <% } %>
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      var draft;
+      try { draft = JSON.parse(raw); } catch(e) { localStorage.removeItem(DRAFT_KEY); return; }
+
+      var hasData = false;
+      DRAFT_FIELDS.forEach(function(n) {
+        if (draft[n] !== undefined) {
+          var el = mainForm.querySelector('[name="' + n + '"]');
+          if (el) { el.value = draft[n]; if (draft[n]) hasData = true; }
+        }
+      });
+      if (draft.kode_dx) {
+        var ke = document.getElementById('kode_dx');
+        var ie = document.getElementById('icd-search');
+        if (ke) ke.value = draft.kode_dx;
+        if (ie) ie.value = draft.icd_display || draft.kode_dx;
+        hasData = true;
+      }
+      if (draft.resep && draft.resep.length > 0) {
+        var tbody = document.getElementById('resep-body');
+        if (tbody) {
+          draft.resep.forEach(function(rd, i) {
+            var rows = tbody.querySelectorAll('.resep-row');
+            var row = i < rows.length ? rows[i] : (function(){ var r = rows[0].cloneNode(true); tbody.appendChild(r); return r; })();
+            function sv(sel, val){ var el=row.querySelector(sel); if(el) el.value=val||''; }
+            sv('[name="nama_obat[]"]',  rd.nama_obat);
+            sv('[name="dosis[]"]',      rd.dosis);
+            sv('[name="frekuensi[]"]',  rd.frekuensi);
+            sv('[name="durasi[]"]',     rd.durasi);
+            sv('[name="jumlah[]"]',     rd.jumlah);
+            sv('[name="cara_pakai[]"]', rd.cara_pakai);
+            if (rd.nama_obat) hasData = true;
+          });
+        }
+      }
+      if (hasData) {
+        var notice = document.createElement('div');
+        notice.style.cssText = 'margin-bottom:12px;padding:10px 16px;background:#fffbea;border-left:3px solid #f5a623;border-radius:4px;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;';
+        notice.innerHTML = '<span>&#9888; Data draft dipulihkan otomatis (halaman sempat reload). Lanjutkan mengisi atau <button type="button" style="background:none;border:none;cursor:pointer;color:#c77700;text-decoration:underline;font-size:13px;padding:0;">hapus draft</button>.</span>';
+        notice.querySelector('button').onclick = function() {
+          localStorage.removeItem(DRAFT_KEY);
+          mainForm.reset();
+          var ke2=document.getElementById('kode_dx'); if(ke2) ke2.value='';
+          var ie2=document.getElementById('icd-search'); if(ie2) ie2.value='';
+          notice.remove();
+        };
+        mainForm.parentNode.insertBefore(notice, mainForm);
+      }
+    }
+
+    mainForm.addEventListener('input',  saveDraft);
+    mainForm.addEventListener('change', saveDraft);
+    mainForm.addEventListener('submit', function() { localStorage.removeItem(DRAFT_KEY); });
+
+    window.addEventListener('beforeunload', function(e) {
+      var d = collectDraft();
+      var dirty = DRAFT_FIELDS.some(function(n){ return d[n] && d[n].toString().trim(); }) ||
+                  d.kode_dx ||
+                  (d.resep && d.resep.some(function(r){ return r.nama_obat; }));
+      if (dirty) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    restoreDraft();
+  }
+  <% } %>
+  // ---- end auto-save draft ----
+
   var addBtn   = document.getElementById('add-resep');
   var body     = document.getElementById('resep-body');
   var icdInput  = document.getElementById('icd-search');

@@ -231,9 +231,6 @@ export class AuthController {
   private completeSendToken = async (req: Request, res: Response, pending: any): Promise<void> => {
     delete (req.session as any).totp_pending;
 
-    const token = signToken({ sub: pending.id, peran: pending.peran, nama: pending.nama_lengkap });
-    setTokenCookie(res, token, false);
-
     await logAudit({
       req,
       user: { sub: pending.id, peran: pending.peran, nama: pending.nama_lengkap },
@@ -244,10 +241,20 @@ export class AuthController {
     });
 
     if (!pending.totp_secret) {
+      // Simpan identitas di session untuk alur setup MFA — JWT belum diterbitkan
+      (req.session as any).mfa_setup_pending = {
+        id: pending.id,
+        peran: pending.peran,
+        nama: pending.nama_lengkap,
+      };
       req.flash('info', 'Selamat datang! Silakan setup autentikator MFA Anda sebelum melanjutkan.');
       res.redirect('/auth/setup-mfa');
       return;
     }
+
+    // Token hanya diterbitkan setelah MFA dikonfirmasi sudah terkonfigurasi
+    const token = signToken({ sub: pending.id, peran: pending.peran, nama: pending.nama_lengkap });
+    setTokenCookie(res, token, false);
 
     const redirectMap: Record<string, string> = {
       super_admin: '/audit',
@@ -325,6 +332,7 @@ export class AuthController {
     });
 
     const redirectMap: Record<string, string> = {
+      super_admin: '/audit',
       admin: '/admin',
       dokter: '/antrian',
       perawat: '/kedatangan',
@@ -340,7 +348,12 @@ export class AuthController {
   // ============================================================
 
   showSetupMFA = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user!.sub;
+    const userId = req.user?.sub ?? (req.session as any).mfa_setup_pending?.id;
+    if (!userId) {
+      res.redirect('/auth/login');
+      return;
+    }
+
     const user = await this.model.findUserById(userId);
 
     if (!user) {
@@ -372,7 +385,14 @@ export class AuthController {
   };
 
   verifySetupMFA = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user!.sub;
+    const isPostLoginSetup = !req.cookies?.token && (req.session as any).mfa_setup_pending;
+    const userId = req.user?.sub ?? (req.session as any).mfa_setup_pending?.id;
+
+    if (!userId) {
+      res.redirect('/auth/login');
+      return;
+    }
+
     const { totp_kode } = req.body as { totp_kode: string };
 
     const user = await this.model.findUserById(userId);
@@ -402,6 +422,13 @@ export class AuthController {
       tabel_target: 'Users', id_target: userId,
       status: 'sukses',
     });
+
+    // Jika dari alur post-login (tidak ada JWT sebelumnya): hapus session, baru issue JWT
+    if (isPostLoginSetup) {
+      delete (req.session as any).mfa_setup_pending;
+      const token = signToken({ sub: user.id, peran: user.peran, nama: user.nama_lengkap });
+      setTokenCookie(res, token, false);
+    }
 
     req.flash('success', 'Autentikator berhasil dikonfigurasi! Login berikutnya akan memerlukan kode dari aplikasi.');
 

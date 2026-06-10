@@ -1,10 +1,35 @@
 import { Server as SocketServer, Socket } from 'socket.io';
+import jwt from 'jsonwebtoken';
+import { env } from '../config/env';
+import { JwtPayload } from '../types';
 
 export function setupQueueSocket(io: SocketServer): void {
+  // Verifikasi JWT dari cookie sebelum koneksi diterima
+  io.use((socket, next) => {
+    const cookieHeader = socket.handshake.headers.cookie ?? '';
+    const tokenMatch = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
+    if (!tokenMatch) {
+      return next(new Error('Unauthorized'));
+    }
+    try {
+      const payload = jwt.verify(tokenMatch[1], env.JWT_SECRET) as JwtPayload;
+      socket.data.user = payload;
+      next();
+    } catch {
+      next(new Error('Unauthorized'));
+    }
+  });
+
   io.on('connection', (socket: Socket) => {
-    // Dokter join room saat buka dashboard
+    // Dokter hanya bisa join room miliknya sendiri
     socket.on('join:doctor', (doctorId: string) => {
-      if (typeof doctorId === 'string' && doctorId.length > 0) {
+      const user: JwtPayload = socket.data.user;
+      if (
+        typeof doctorId === 'string' &&
+        doctorId.length > 0 &&
+        user?.peran === 'dokter' &&
+        user?.sub === doctorId
+      ) {
         socket.join(`doctor-${doctorId}`);
       }
     });

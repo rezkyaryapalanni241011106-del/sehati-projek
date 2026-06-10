@@ -29,6 +29,20 @@ export const env = {
   OTP_MOCK: optional('OTP_MOCK', 'true') === 'true',
   OTP_EXPIRY_MINUTES: parseInt(optional('OTP_EXPIRY_MINUTES', '5'), 10),
 
+  // WhatsApp provider: 'meta' = WhatsApp Cloud API, 'fonnte' = Fonnte
+  WA_PROVIDER: optional('WA_PROVIDER', 'fonnte') as 'meta' | 'fonnte',
+
+  // Fonnte (https://fonnte.com)
+  FONNTE_TOKEN: optional('FONNTE_TOKEN', ''),
+
+  // WhatsApp Cloud API — Meta (https://developers.facebook.com)
+  WA_PHONE_NUMBER_ID: optional('WA_PHONE_NUMBER_ID', ''),
+  WA_ACCESS_TOKEN: optional('WA_ACCESS_TOKEN', ''),
+  WA_TEMPLATE_NAME: optional('WA_TEMPLATE_NAME', 'otp_sehati'),
+  WA_TEMPLATE_LANGUAGE: optional('WA_TEMPLATE_LANGUAGE', 'id'),
+  // true jika template punya tombol "Copy Code", false jika hanya teks biasa
+  WA_TEMPLATE_HAS_BUTTON: optional('WA_TEMPLATE_HAS_BUTTON', 'true') === 'true',
+
   UPLOAD_PATH: optional('UPLOAD_PATH', 'src/public/uploads'),
   MAX_FILE_SIZE_MB: parseInt(optional('MAX_FILE_SIZE_MB', '10'), 10),
 

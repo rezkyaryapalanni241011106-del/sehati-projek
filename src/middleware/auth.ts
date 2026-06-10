@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { pool } from '../config/database';
 import { env } from '../config/env';
 import { JwtPayload, Peran } from '../types';
 
@@ -62,6 +63,37 @@ export function checkRole(...roles: (Peran | 'pasien')[]) {
     }
     next();
   };
+}
+
+// Middleware untuk route setup-mfa: izinkan akses via JWT (staf sudah login)
+// ATAU via session mfa_setup_pending (staf baru selesai password login, belum punya JWT)
+export async function verifyJWTOrMfaSetup(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const token = req.cookies?.token;
+  if (token) {
+    try {
+      const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+      req.user = payload;
+      setNoCache(res);
+      return next();
+    } catch {
+      res.clearCookie('token');
+    }
+  }
+
+  const pending = (req.session as any).mfa_setup_pending as { id: string; peran: string; nama: string } | undefined;
+  if (pending?.id) {
+    const [rows] = await pool.execute<any[]>(
+      'SELECT id, peran, nama_lengkap FROM Users WHERE id = ? AND status_aktif = 1',
+      [pending.id]
+    );
+    if (rows.length > 0) {
+      req.user = { sub: rows[0].id, peran: rows[0].peran, nama: rows[0].nama_lengkap } as JwtPayload;
+      setNoCache(res);
+      return next();
+    }
+  }
+
+  res.redirect('/auth/login');
 }
 
 export function signToken(payload: Omit<JwtPayload, 'iat' | 'exp' | 'last_active'>): string {

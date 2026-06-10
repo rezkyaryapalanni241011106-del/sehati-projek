@@ -4,23 +4,30 @@ export class NomorRMService {
   async generate(): Promise<string> {
     const tahun = new Date().getFullYear();
     const prefix = `RM-${tahun}-`;
+    const lockName = 'nomor_rm_lock';
 
-    const [rows] = await pool.execute<any[]>(
-      `SELECT nomor_rm FROM Pasien
-       WHERE nomor_rm LIKE ?
-       ORDER BY nomor_rm DESC
-       LIMIT 1`,
-      [`${prefix}%`]
-    );
+    // Advisory lock mencegah race condition pada pendaftaran bersamaan
+    await pool.execute('SELECT GET_LOCK(?, 10)', [lockName]);
+    try {
+      const [rows] = await pool.execute<any[]>(
+        `SELECT nomor_rm FROM Pasien
+         WHERE nomor_rm LIKE ?
+         ORDER BY nomor_rm DESC
+         LIMIT 1`,
+        [`${prefix}%`]
+      );
 
-    let urutan = 1;
-    if (rows.length > 0) {
-      const last: string = rows[0].nomor_rm;
-      const parts = last.split('-');
-      urutan = parseInt(parts[parts.length - 1], 10) + 1;
+      let urutan = 1;
+      if (rows.length > 0) {
+        const last: string = rows[0].nomor_rm;
+        const parts = last.split('-');
+        urutan = parseInt(parts[parts.length - 1], 10) + 1;
+      }
+
+      return `${prefix}${String(urutan).padStart(6, '0')}`;
+    } finally {
+      await pool.execute('SELECT RELEASE_LOCK(?)', [lockName]);
     }
-
-    return `${prefix}${String(urutan).padStart(6, '0')}`;
   }
 }
 

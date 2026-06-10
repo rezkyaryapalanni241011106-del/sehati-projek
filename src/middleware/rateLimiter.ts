@@ -1,12 +1,12 @@
 import rateLimit from 'express-rate-limit';
 
-// Rate limiter untuk endpoint login — 5 percobaan gagal → kunci 15 menit (FR-03)
+// Rate limiter untuk endpoint login — 5 percobaan gagal → kunci 30 menit (FR-03)
 export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 30 * 60 * 1000,
   max: 5,
   skipSuccessfulRequests: true,
   message: {
-    message: 'Terlalu banyak percobaan login. Akun dikunci selama 15 menit.',
+    message: 'Terlalu banyak percobaan login. Akun dikunci selama 30 menit.',
   },
   standardHeaders: true,
   legacyHeaders: false,

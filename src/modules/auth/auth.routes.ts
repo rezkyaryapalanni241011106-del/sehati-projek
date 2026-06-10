@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { AuthController } from './auth.controller';
 import { loginLimiter } from '../../middleware/rateLimiter';
-import { verifyJWT } from '../../middleware/auth';
+import { verifyJWT, verifyJWTOrMfaSetup } from '../../middleware/auth';
 
 const router = Router();
 const ctrl = new AuthController();
@@ -26,8 +26,8 @@ router.post('/logout', ctrl.logoutStaf);
 router.get('/ubah-password', verifyJWT, ctrl.showUbahPassword);
 router.post('/ubah-password', verifyJWT, ctrl.prosesUbahPassword);
 
-// ---- MFA Setup (staf yang sudah login) ----
-router.get('/setup-mfa', verifyJWT, ctrl.showSetupMFA);
-router.post('/setup-mfa/verify', verifyJWT, ctrl.verifySetupMFA);
+// ---- MFA Setup (staf yang sudah login ATAU baru login, belum ada JWT) ----
+router.get('/setup-mfa', verifyJWTOrMfaSetup, ctrl.showSetupMFA);
+router.post('/setup-mfa/verify', verifyJWTOrMfaSetup, ctrl.verifySetupMFA);
 
 export default router;

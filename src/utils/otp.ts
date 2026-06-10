@@ -1,6 +1,7 @@
 import { pool } from '../config/database';
 import { env } from '../config/env';
 import { v4 as uuidv4 } from 'uuid';
+import { kirimOTPWhatsApp } from './whatsapp';
 
 export class OtpService {
   generateKode(): string {
@@ -22,9 +23,7 @@ export class OtpService {
       [uuidv4(), nomorHp, kode, expiredAt]
     );
 
-    if (env.OTP_MOCK) {
-      console.log(`[OTP MOCK] Nomor: ${nomorHp} | Kode: ${kode} | Berlaku: ${env.OTP_EXPIRY_MINUTES} menit`);
-    }
+    await kirimOTPWhatsApp(nomorHp, kode);
 
     return kode;
   }

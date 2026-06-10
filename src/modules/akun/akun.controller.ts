@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { logAudit } from '../../utils/auditLogger';
+import { logError } from '../../utils/logger';
 import { env } from '../../config/env';
 import { v4 as uuidv4 } from 'uuid';
 import { AkunModel } from './akun.model';
@@ -64,7 +65,7 @@ export class AkunController {
       await logAudit({ req, user: req.user, aktivitas: 'BUAT_AKUN', tabel_target: 'Users', id_target: id, status: 'sukses', keterangan: `Akun baru: ${username}` });
       req.flash('success', `Akun ${username} berhasil dibuat. Password: ${pass}`);
     } catch (err: any) {
-      console.error('[buatStaf ERROR]', err.code, err.message);
+      logError('buatStaf', err, { username });
       if (err.code === 'ER_DUP_ENTRY') {
         req.flash('error', 'Username atau email sudah digunakan.');
       } else {
@@ -145,8 +146,13 @@ export class AkunController {
       console.log(`[AKUN ADMIN BARU] ${username} / password: ${pass}`);
       await logAudit({ req, user: req.user, aktivitas: 'BUAT_AKUN_ADMIN', tabel_target: 'Users', id_target: id, status: 'sukses' });
       req.flash('success', `Akun admin ${username} berhasil dibuat. Password: ${pass}`);
-    } catch {
-      req.flash('error', 'Username atau email sudah digunakan.');
+    } catch (err: any) {
+      logError('buatAdmin', err, { username });
+      if (err.code === 'ER_DUP_ENTRY') {
+        req.flash('error', 'Username atau email sudah digunakan.');
+      } else {
+        req.flash('error', 'Gagal membuat akun admin. Periksa kembali data yang diisi.');
+      }
     }
     res.redirect('/akun/admin');
   };

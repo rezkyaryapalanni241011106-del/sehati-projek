@@ -204,6 +204,20 @@ CREATE TABLE IF NOT EXISTS Audit_Log (
   INDEX idx_audit_waktu (waktu)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ============================================================
+-- 11. KOREKSI_SOAP (addendum rekam medis — FR-38)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS Koreksi_SOAP (
+  id           VARCHAR(36)  NOT NULL DEFAULT (UUID()),
+  id_soap      VARCHAR(36)  NOT NULL,
+  id_dokter    VARCHAR(36)  NOT NULL,
+  catatan      TEXT         NOT NULL,
+  created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id_soap)   REFERENCES Catatan_SOAP(id) ON DELETE CASCADE,
+  FOREIGN KEY (id_dokter) REFERENCES Users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
