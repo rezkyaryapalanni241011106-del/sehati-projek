@@ -35,6 +35,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
       Akun Admin
     </a>
+    <a href="/auth/ubah-password" class="nav-item">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      Ganti Password
+    </a>
     <div class="sidebar-section">Pengawasan (read-only)</div>
     <details class="nav-group">
       <summary>
@@ -88,7 +92,7 @@
     <div class="main-topbar">
       <div class="searchbox">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" placeholder="Cari akun, log, jadwal…">
+        <input type="text" id="topbarSearch" placeholder="Cari akun, log, jadwal…">
       </div>
       <div class="right-tools">
         <div class="user-chip">
@@ -209,5 +213,6 @@ document.getElementById('modalReset').addEventListener('click', function(e) {
   if (e.target === this) tutupModalReset();
 });
 </script>
+<script src="/public/js/topbar-search.js"></script>
 </body>
 </html>

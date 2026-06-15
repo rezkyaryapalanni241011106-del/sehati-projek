@@ -100,4 +100,27 @@ export class BookingModel {
       [idJadwal, tanggal, slotJam, kunjunganId]
     );
   }
+
+  async findInfoDokter(idDokter: string): Promise<{ dokter: any; jadwal: any[] } | null> {
+    const [rows] = await pool.execute<any[]>(
+      `SELECT u.nama_lengkap, s.nama AS spesialisasi_nama,
+              jp.hari, jp.jam_mulai, jp.jam_selesai, jp.durasi_menit
+       FROM Users u
+       LEFT JOIN Spesialisasi s ON u.spesialisasi = s.id
+       JOIN Jadwal_Praktek jp ON jp.id_dokter = u.id AND jp.status_aktif = 1
+       WHERE u.id = ? AND u.status_aktif = 1
+       ORDER BY FIELD(jp.hari,'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu')`,
+      [idDokter]
+    );
+    if (!rows.length) return null;
+    return {
+      dokter: { nama_lengkap: rows[0].nama_lengkap, spesialisasi_nama: rows[0].spesialisasi_nama },
+      jadwal: rows.map(r => ({
+        hari: r.hari,
+        jam_mulai: r.jam_mulai.substring(0, 5),
+        jam_selesai: r.jam_selesai.substring(0, 5),
+        durasi_menit: r.durasi_menit,
+      })),
+    };
+  }
 }

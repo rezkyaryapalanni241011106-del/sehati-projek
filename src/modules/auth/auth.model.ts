@@ -1,10 +1,11 @@
 import { pool } from '../../config/database';
+import { hashPencarian } from '../../utils/encrypt';
 
 export class AuthModel {
   async findPasienByNomorHp(nomorHp: string): Promise<any | null> {
     const [rows] = await pool.execute<any[]>(
-      'SELECT id, nomor_rm, nama_lengkap FROM Pasien WHERE nomor_hp = ? LIMIT 1',
-      [nomorHp]
+      'SELECT id, nomor_rm, nama_lengkap FROM Pasien WHERE nomor_hp_hash = ? LIMIT 1',
+      [hashPencarian(nomorHp)]
     );
     return rows[0] ?? null;
   }

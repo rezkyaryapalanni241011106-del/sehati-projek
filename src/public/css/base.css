@@ -75,14 +75,32 @@ input, textarea, select {
   font-size: inherit;
 }
 
+/* ------------------------------ Flash messages ------------------------------ */
+.flash {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  margin-bottom: 16px;
+}
+.flash.success { background: var(--ringan-bg);  color: var(--ringan);   border: 1px solid var(--ringan-soft); }
+.flash.error   { background: var(--kritis-bg);  color: var(--kritis);   border: 1px solid var(--kritis-soft); }
+.flash.info    { background: var(--accent-soft); color: var(--accent);   border: 1px solid #c5d3d5; }
+
 /* ------------------------------ Topbar ------------------------------ */
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 28px;
+  padding: 12px 28px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(10, 31, 36, 0.06);
 }
 
 .topbar .logo {
@@ -222,6 +240,7 @@ input, textarea, select {
 .badge-menengah { color: var(--menengah); background: var(--menengah-bg); }
 .badge-ringan   { color: var(--ringan);   background: var(--ringan-bg); }
 .badge-muted    { color: var(--ink-soft); background: var(--bg-soft); }
+.badge-accent   { color: var(--accent);   background: var(--accent-soft); }
 
 /* ------------------------------ Alert ------------------------------ */
 .alert {

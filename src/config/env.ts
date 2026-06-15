@@ -26,6 +26,9 @@ export const env = {
 
   BCRYPT_ROUNDS: parseInt(optional('BCRYPT_ROUNDS', '12'), 10),
 
+  ENCRYPTION_KEY: required('ENCRYPTION_KEY'),
+  HMAC_KEY:       required('HMAC_KEY'),
+
   OTP_MOCK: optional('OTP_MOCK', 'true') === 'true',
   OTP_EXPIRY_MINUTES: parseInt(optional('OTP_EXPIRY_MINUTES', '5'), 10),
 

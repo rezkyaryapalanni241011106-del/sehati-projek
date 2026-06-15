@@ -131,7 +131,7 @@
       <strong><%= pasien ? pasien.nama_lengkap : user.nama %></strong>
       <% if (pasien) { %><span><%= pasien.nomor_rm %></span><% } %>
     </div>
-    <a class="back-link" href="/auth/logout" style="font-size:13px;">Keluar</a>
+    <a class="back-link" href="/auth/pasien/logout" style="font-size:13px;">Keluar</a>
   </div>
 </header>
 
@@ -180,8 +180,9 @@
             <div class="upcoming-meta">dr. <%= k.nama_dokter %><% if (k.spesialisasi) { %> · <%= k.spesialisasi %><% } %></div>
           </div>
           <div class="upcoming-actions">
-            <% const statusLabel = {booked:'Terjadwal', hadir:'Hadir'}; %>
-            <span class="badge badge-menengah"><%= statusLabel[k.status] || k.status %></span>
+            <% const statusLabel = {booked:'Terjadwal', hadir:'Hadir', selesai:'Selesai', batal:'Batal', skip:'Tidak Hadir'}; %>
+            <% const statusBadge = {booked:'badge-accent', hadir:'badge-ringan', selesai:'badge-ringan', batal:'badge-kritis', skip:'badge-muted'}; %>
+            <span class="badge <%= statusBadge[k.status] || 'badge-muted' %>"><%= statusLabel[k.status] || k.status %></span>
             <% if (k.status === 'booked') { %>
               <a href="/booking/<%= k.id %>/reschedule" class="btn btn-ghost btn-sm">Jadwalkan Ulang</a>
               <a href="/keluhan/<%= k.id %>" class="btn btn-ghost btn-sm">Keluhan</a>
