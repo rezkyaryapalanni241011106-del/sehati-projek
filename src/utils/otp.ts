@@ -45,7 +45,6 @@ export class OtpService {
 
   async buat(nomorHp: string): Promise<string> {
     const kode = this.generateKode();
-    const expiredAt = new Date(Date.now() + env.OTP_EXPIRY_MINUTES * 60 * 1000);
 
     // Nonaktifkan OTP lama untuk nomor yang sama
     await pool.execute(
@@ -54,8 +53,8 @@ export class OtpService {
     );
 
     await pool.execute(
-      'INSERT INTO OTP (id, nomor_hp, kode, expired_at) VALUES (?, ?, ?, ?)',
-      [uuidv4(), nomorHp, kode, expiredAt]
+      'INSERT INTO OTP (id, nomor_hp, kode, expired_at) VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))',
+      [uuidv4(), nomorHp, kode, env.OTP_EXPIRY_MINUTES]
     );
 
     await kirimOTPWhatsApp(nomorHp, kode);

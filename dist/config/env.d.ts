@@ -1,0 +1,31 @@
+import 'dotenv/config';
+export declare const env: {
+    NODE_ENV: string;
+    PORT: number;
+    DB_HOST: string;
+    DB_PORT: number;
+    DB_USER: string;
+    DB_PASSWORD: string;
+    DB_NAME: string;
+    JWT_SECRET: string;
+    JWT_EXPIRES_IN: string;
+    SESSION_SECRET: string;
+    BCRYPT_ROUNDS: number;
+    OTP_MOCK: boolean;
+    OTP_EXPIRY_MINUTES: number;
+    WA_PROVIDER: "meta" | "fonnte";
+    FONNTE_TOKEN: string;
+    WA_PHONE_NUMBER_ID: string;
+    WA_ACCESS_TOKEN: string;
+    WA_TEMPLATE_NAME: string;
+    WA_TEMPLATE_LANGUAGE: string;
+    WA_TEMPLATE_HAS_BUTTON: boolean;
+    UPLOAD_PATH: string;
+    MAX_FILE_SIZE_MB: number;
+    APP_NAME: string;
+    CLINIC_NAME: string;
+    CLINIC_ADDRESS: string;
+    CLINIC_PHONE: string;
+    isProd: () => boolean;
+};
+//# sourceMappingURL=env.d.ts.map

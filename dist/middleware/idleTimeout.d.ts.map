@@ -1,0 +1,1 @@
+{"version":3,"file":"idleTimeout.d.ts","sourceRoot":"","sources":["../../src/middleware/idleTimeout.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,YAAY,EAAE,MAAM,SAAS,CAAC;AAQ1D,wBAAgB,eAAe,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ,EAAE,IAAI,EAAE,YAAY,GAAG,IAAI,CA2BrF"}
