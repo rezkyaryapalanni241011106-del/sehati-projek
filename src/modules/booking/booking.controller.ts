@@ -59,6 +59,13 @@ export class BookingController {
     res.json({ slots, jadwal_id: jadwal.id });
   };
 
+  getInfoDokter = async (req: Request, res: Response): Promise<void> => {
+    const { id_dokter } = req.query as { id_dokter?: string };
+    if (!id_dokter) { res.json(null); return; }
+    const info = await this.model.findInfoDokter(id_dokter);
+    res.json(info);
+  };
+
   buatBooking = async (req: Request, res: Response): Promise<void> => {
     const pasienId = req.user!.sub;
     const { id_dokter, id_jadwal, tanggal, slot_jam } = req.body;

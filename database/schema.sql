@@ -49,11 +49,13 @@ CREATE TABLE IF NOT EXISTS Users (
 CREATE TABLE IF NOT EXISTS Pasien (
   id                VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
   nomor_rm          VARCHAR(20)  NOT NULL UNIQUE,
-  nik               VARCHAR(16)  UNIQUE,
+  nik               TEXT         NULL,
+  nik_hash          VARCHAR(64)  NULL UNIQUE,
   nama_lengkap      VARCHAR(200) NOT NULL,
   tanggal_lahir     DATE         NOT NULL,
   jenis_kelamin     ENUM('L','P') NOT NULL,
-  nomor_hp          VARCHAR(20)  NOT NULL UNIQUE,
+  nomor_hp          TEXT         NOT NULL,
+  nomor_hp_hash     VARCHAR(64)  NOT NULL UNIQUE,
   alamat            TEXT         NOT NULL,
   pekerjaan         VARCHAR(100),
   pendidikan        VARCHAR(100),
@@ -62,8 +64,8 @@ CREATE TABLE IF NOT EXISTS Pasien (
   golongan_darah    ENUM('A','B','AB','O','A+','A-','B+','B-','AB+','AB-','O+','O-'),
   alergi            TEXT,
   riwayat_kronis    TEXT,
-  nomor_paspor      VARCHAR(50),
-  nik_wali          VARCHAR(16),
+  nomor_paspor      TEXT         NULL,
+  nik_wali          TEXT         NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

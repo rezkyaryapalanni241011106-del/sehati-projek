@@ -43,7 +43,7 @@
     <div class="main-topbar">
       <div class="searchbox">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" placeholder="Cari pasien, nomor RM…">
+        <input type="text" id="topbarSearch" placeholder="Cari pasien, nomor RM…">
       </div>
       <div class="right-tools">
         <div class="user-chip">
@@ -78,7 +78,7 @@
       <% if (!kunjungans || kunjungans.length === 0) { %>
         <div class="card card-padded muted">Belum ada kunjungan.</div>
       <% } else { kunjungans.forEach(function(k) { %>
-        <div class="card card-padded" style="margin-bottom:12px;">
+        <div class="card card-padded" style="margin-bottom:12px;" data-search-item>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <b><%= new Date(k.tanggal).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) %></b>
             <% const bm = {booked:'menengah', hadir:'menengah', selesai:'ringan', batal:'kritis', skip:'muted'}; %>
@@ -98,5 +98,6 @@
     </div>
   </section>
 </div>
+<script src="/public/js/topbar-search.js"></script>
 </body>
 </html>

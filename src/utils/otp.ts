@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { kirimOTPWhatsApp } from './whatsapp';
 
 // Maks permintaan OTP per nomor per jam
-const MAX_OTP_REQUEST_PER_JAM = 3;
+const MAX_OTP_REQUEST_PER_JAM = 5;
 // Maks percobaan verify gagal per nomor per 15 menit
 const MAX_OTP_VERIFY_GAGAL_PER_15MENIT = 5;
 
@@ -53,7 +53,8 @@ export class OtpService {
     );
 
     await pool.execute(
-      'INSERT INTO OTP (id, nomor_hp, kode, expired_at) VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))',
+      `INSERT INTO OTP (id, nomor_hp, kode, expired_at)
+       VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))`,
       [uuidv4(), nomorHp, kode, env.OTP_EXPIRY_MINUTES]
     );
 

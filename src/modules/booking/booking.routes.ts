@@ -10,6 +10,7 @@ router.use(verifyJWTPasien);
 router.get('/', ctrl.showBookingForm);
 router.get('/dokter', ctrl.getDokterList);
 router.get('/slots', ctrl.getSlots);
+router.get('/info-dokter', ctrl.getInfoDokter);
 router.post('/', ctrl.buatBooking);
 router.get('/:id/reschedule', ctrl.showReschedule);
 router.post('/:id/reschedule', ctrl.doReschedule);

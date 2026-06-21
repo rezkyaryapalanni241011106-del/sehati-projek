@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import flash from 'connect-flash';
@@ -25,6 +26,24 @@ import adminRoutes from './modules/admin/admin.routes';
 import { pool } from './config/database';
 
 const app = express();
+
+// ============================================================
+// Security headers
+// ============================================================
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:    ["'self'"],
+      styleSrc:      ["'self'", "'unsafe-inline'"],
+      scriptSrc:     ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
+      imgSrc:        ["'self'", "data:"],
+      fontSrc:       ["'self'"],
+      connectSrc:    ["'self'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
 
 // ============================================================
 // View engine
