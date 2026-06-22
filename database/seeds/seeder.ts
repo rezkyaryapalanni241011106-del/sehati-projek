@@ -2,8 +2,8 @@ import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import speakeasy from 'speakeasy';
 import { v4 as uuidv4 } from 'uuid';
-import { pool, testConnection } from '../config/database';
-import { env } from '../config/env';
+import { pool, testConnection } from '../../src/config/database';
+import { env } from '../../src/config/env';
 
 const PASS = 'password123';
 
