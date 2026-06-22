@@ -7,8 +7,10 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed": "ts-node src/utils/seeder.ts",
-    "seed:harian": "ts-node src/utils/seed-harian.ts"
+    "seed": "ts-node database/seeds/seeder.ts",
+    "seed:harian": "ts-node database/seeds/seed-harian.ts",
+    "seed:demo": "ts-node database/seeds/seed-demo.ts",
+    "import:icd10": "ts-node src/utils/import-icd10.ts"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",

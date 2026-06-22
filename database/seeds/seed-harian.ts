@@ -1,11 +1,11 @@
 /**
  * seed-harian.ts
  * Mengisi data kunjungan hari ini untuk keperluan pengujian manual.
- * Jalankan: npx ts-node src/utils/seed-harian.ts
+ * Jalankan: npx ts-node database/seeds/seed-harian.ts
  */
 import 'dotenv/config';
 import { v4 as uuidv4 } from 'uuid';
-import { pool, testConnection } from '../config/database';
+import { pool, testConnection } from '../../src/config/database';
 
 // ─── Tanggal & hari hari ini ─────────────────────────────────────────────────
 const now   = new Date();
