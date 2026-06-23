@@ -9,15 +9,15 @@
   <link rel="stylesheet" href="/public/css/admin.css">
   <link rel="stylesheet" href="/public/css/sehati.css">
   <style>
-    .stat-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:24px; }
-    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px 18px; }
-    .stat-label { font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
-    .stat-value { font-size:32px; font-weight:700; line-height:1; }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px; }
+    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px; display:flex; flex-direction:column; justify-content:space-between; min-height:140px; }
+    .stat-label { font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+    .stat-value { font-size:28px; font-weight:700; line-height:1.2; flex-grow:1; }
     .stat-sub { font-size:12px; color:var(--ink-soft); margin-top:4px; }
     .stat-value.green { color: #16a34a; }
     .stat-value.red   { color: var(--kritis); }
     .stat-value.blue  { color: var(--accent); }
-    .section-title { font-size:14px; font-weight:600; margin-bottom:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; }
+    .section-title { font-size:14px; font-weight:600; margin:0 0 12px 0; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; }
   </style>
 </head>
 <body>
@@ -162,6 +162,7 @@
       <div class="stat-grid">
         <div class="stat-card">
           <div class="stat-label">Total Pasien</div>
+          <div class="stat-label">Total Pasien</div>
           <div class="stat-value blue"><%= pasienStats.total || 0 %></div>
           <div class="stat-sub">terdaftar</div>
         </div>
@@ -226,7 +227,6 @@
       <div style="margin-top:12px; text-align:right;">
         <a href="/audit/log" class="back-link">Lihat semua jejak audit →</a>
       </div>
-
     </div>
   </section>
 </div>
